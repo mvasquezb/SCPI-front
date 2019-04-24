@@ -51,15 +51,13 @@
   </section>
 </template>
 
-<script lang="ts">
-import { Component, Vue, Prop } from "vue-property-decorator";
-import { Todo as TodoModel } from "@/models.ts";
-import Router from 'vue-router'
+<script lang="js">
+import { Component, Vue } from "vue-property-decorator";
 
-const filters: { [key: string]: (todos: TodoModel[]) => TodoModel[] } = {
-  all: (todos: TodoModel[]) => todos,
-  completed: (todos: TodoModel[]) => todos.filter(t => t.completed),
-  active: (todos: Array<TodoModel>) => todos.filter(t => !t.completed)
+const filters = {
+  all: (todos) => todos,
+  completed: (todos) => todos.filter(t => t.completed),
+  active: (todos) => todos.filter(t => !t.completed)
 };
 
 @Component({
@@ -71,22 +69,26 @@ const filters: { [key: string]: (todos: TodoModel[]) => TodoModel[] } = {
     }
   },
   filters: {
-    pluralize: (num: number) => {
+    pluralize: (num) => {
       return num == 1 ? "item" : "items";
     }
+  },
+  props: {
+    todos: {
+      default: []
+    },
   }
 })
 export default class TodoList extends Vue {
-  @Prop() todos!: TodoModel[];
-  visibility: string = "all";
-  editedTodo?: TodoModel | null = null;
-  beforeEdit: string = "";
+  visibility = "all";
+  editedTodo = null;
+  beforeEdit = "";
 
   get allDone() {
     return this.remaining == 0;
   }
 
-  set allDone(value: boolean) {
+  set allDone(value) {
     this.todos.forEach(t => (t.completed = value));
   }
 
@@ -98,16 +100,16 @@ export default class TodoList extends Vue {
     return filters[this.visibility](this.todos);
   }
 
-  editTodo(todo: TodoModel) {
+  editTodo(todo) {
     this.beforeEdit = todo.title;
     this.editedTodo = todo;
   }
 
-  removeTodo(todo: TodoModel) {
+  removeTodo(todo) {
     this.todos.splice(this.todos.indexOf(todo), 1);
   }
 
-  doneEdit(todo: TodoModel) {
+  doneEdit(todo) {
     if (!this.editedTodo) {
       return;
     }
@@ -118,7 +120,7 @@ export default class TodoList extends Vue {
     }
   }
 
-  cancelEdit(todo: TodoModel) {
+  cancelEdit(todo) {
     this.editedTodo = null;
     todo.title = this.beforeEdit;
   }

@@ -1,17 +1,16 @@
 <template>
-  <div class="home todoapp">
+  <div class="home todoapp col-md-offset-4">
     <Todo v-on:add-todo="addTodo" />
     <TodoList v-bind:todos="todos" />
   </div>
 </template>
 
-<script lang="ts">
+<script lang="js">
 import { Component, Vue } from 'vue-property-decorator';
-import HelloWorld from '@/components/HelloWorld.vue'; // @ is an alias to /src
 import Todo from '@/components/Todo.vue';
 import TodoList from '@/components/TodoList.vue';
-import { Todo as TodoModel } from '@/models.ts';
-import http from '@/http.ts';
+import { Todo as TodoModel } from '@/models';
+import http from '@/http';
 
 @Component({
   components: {
@@ -29,13 +28,13 @@ import http from '@/http.ts';
   }
 })
 export default class Home extends Vue {
-  todos: Array<TodoModel> = []
+  todos = []
 
   created() {
     http.get("/todos").then((res) => this.todos = res.data);
   }
 
-  addTodo(newTodo: string) {
+  addTodo(newTodo) {
     this.todos.push(new TodoModel(newTodo));
   }
 }
