@@ -1,5 +1,5 @@
 <template>
-  <div class="home todoapp col-md-offset-4">
+  <div class="home todoapp mx-auto">
     <Todo v-on:add-todo="addTodo" />
     <TodoList v-bind:todos="todos" />
   </div>
