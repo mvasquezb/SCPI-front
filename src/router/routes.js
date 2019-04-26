@@ -3,6 +3,7 @@ import Router from 'vue-router'
 import Home from '@/views/Home.vue'
 import DashboardLayout from '@/layout/dashboard/DashboardLayout.vue';
 import NotFound from "@/pages/NotFoundPage.vue";
+import Login from '@/pages/Login.vue';
 
 Vue.use(Router)
 
@@ -26,6 +27,10 @@ const routes = [
         component: () => import(/* webpackChunkName: "about" */ '@/views/About.vue')
       }
     ]
+  },
+  {
+    path: "/login",
+    component: Login,
   },
   { path: "*", component: NotFound }
 ];
