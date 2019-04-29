@@ -9,7 +9,7 @@ export default new Vuex.Store({
     loggingIn: false,
     loginError: null,
     loginSuccessful: false,
-    userToken: null,
+    currentUser: null,
   },
   mutations: {
     loginStart: (state) => state.loggingIn = true,
@@ -17,8 +17,9 @@ export default new Vuex.Store({
       state.loggingIn = false;
       state.loginError = result.error;
       state.loginSuccessful = result.error == null;
+      console.log(result);
       if (state.loginSuccessful) {
-        state.userToken = result.token;
+        state.currentUser = result.user;
       }
     }
   },
@@ -28,10 +29,10 @@ export default new Vuex.Store({
 
       http.post('login', { ...loginData })
       .then((r) => {
-        commit('loginFinish', { token: r.data.token });
+        commit('loginFinish', r.data);
       })
       .catch((e) => {
-        commit('loginFinish', { error: e.response.data.error });
+        commit('loginFinish', e.response.data);
       })
     }
   }

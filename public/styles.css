@@ -353,3 +353,7 @@ html .clear-completed:active {
     bottom: 10px
   }
 }
+
+.btn-main {
+  background-color: #47525e;
+}
