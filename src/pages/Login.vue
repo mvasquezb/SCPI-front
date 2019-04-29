@@ -65,6 +65,13 @@ export default {
         password: this.password
       });
     }
+  },
+  watch: {
+    loginSuccessful: function(newVal) {
+      if (newVal) {
+        this.$router.replace("home");
+      }
+    }
   }
 };
 </script>
