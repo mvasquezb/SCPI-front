@@ -12,15 +12,26 @@ export default new Vuex.Store({
     currentUser: null,
   },
   mutations: {
+    initialiseStore(state) {
+      let savedState = localStorage.getItem('scpi_store');
+      if (savedState) {
+        this.replaceState(Object.assign(state, JSON.parse(savedState)));
+      }
+    },
     loginStart: (state) => state.loggingIn = true,
     loginFinish: (state, result) => {
       state.loggingIn = false;
       state.loginError = result.error;
       state.loginSuccessful = result.error == null;
-      console.log(result);
       if (state.loginSuccessful) {
         state.currentUser = result.user;
       }
+    },
+    logout: (state) => {
+      state.loggingIn = false;
+      state.loginError = null;
+      state.loginSuccessful = false;
+      state.currentUser = null;
     }
   },
   actions: {
@@ -34,6 +45,9 @@ export default new Vuex.Store({
       .catch((e) => {
         commit('loginFinish', e.response.data);
       })
+    },
+    doLogout({ commit }) {
+      commit('logout');
     }
   }
 });
