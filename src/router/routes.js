@@ -30,9 +30,14 @@ const routes = [
   },
   {
     path: "/login",
+    name: "login",
     component: Login,
   },
-  { path: "*", component: NotFound }
+  {
+    path: "*",
+    name: "notfound",
+    component: NotFound
+  }
 ];
 
 export default routes;

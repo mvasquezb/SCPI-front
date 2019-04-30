@@ -18,7 +18,7 @@
       <div class="collapse navbar-collapse">
         <ul class="navbar-nav ml-auto">
           <li class="nav-item">
-            <a href="#" class="btn btn-main">
+            <a href="#" class="btn btn-main" @click="doLogout">
               <i class="ti-shift-left-alt"></i>
               Salir
             </a>
@@ -29,7 +29,7 @@
   </nav>
 </template>
 <script lang="js">
-import { mapState } from "vuex";
+import { mapState, mapActions } from "vuex";
 
 export default {
   computed: {
@@ -59,7 +59,21 @@ export default {
     },
     hideSidebar() {
       this.$sidebar.displaySidebar(false);
+    },
+    redirectToLogin() {
+      if (!this.currentUser) {
+        this.$router.replace("login");
+      }
+    },
+    ...mapActions(["doLogout"])
+  },
+  watch: {
+    currentUser() {
+      this.redirectToLogin()
     }
+  },
+  created() {
+    this.redirectToLogin();
   }
 };
 </script>

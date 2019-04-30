@@ -58,7 +58,7 @@ export default {
     ...mapState(["loggingIn", "loginError", "loginSuccessful"])
   },
   methods: {
-    ...mapActions(["doLogin"]),
+    ...mapActions(["doLogin", "doLogout"]),
     loginSubmit() {
       this.doLogin({
         username: this.username,
@@ -72,6 +72,9 @@ export default {
         this.$router.replace("home");
       }
     }
+  },
+  mounted() {
+    this.doLogout();
   }
 };
 </script>

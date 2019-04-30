@@ -9,7 +9,7 @@ export default new Vuex.Store({
     loggingIn: false,
     loginError: null,
     loginSuccessful: false,
-    currentUser: null,
+    currentUser: null
   },
   mutations: {
     initialiseStore(state) {
