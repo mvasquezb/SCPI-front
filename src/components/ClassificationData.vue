@@ -1,0 +1,84 @@
+<template>
+  <div class="bg-white classification-data">
+    <button class="btn btn-main classification-item">Pnd</button>
+    <div class="bg-nude classification-item">
+      <p>CALIDAD</p>
+    </div>
+    <DataIndicator
+      v-for="(item, index) in visibleInfoItems"
+      :key="index"
+      class="bg-nude classification-item"
+      :title="item.title"
+      :value="item.value.repr"
+      size="small"
+    />
+  </div>
+</template>
+
+<script>
+import DataIndicator from "@/components/DataIndicator.vue";
+
+export default {
+  components: {
+    DataIndicator
+  },
+  props: {
+    classification: {
+      type: Object,
+      default: () => {}
+    }
+  },
+  data() {
+    return {
+      quantity: this.classification.quantity,
+      defect: this.classification.defect,
+      location: this.classification.defect.location,
+      wagon: this.classification.wagon,
+      date: Date.now(),
+    };
+  },
+  computed: {
+    visibleInfoItems() {
+      return [
+        {
+          title: "Cantidad",
+          value: { repr: this.quantity }
+        },
+        {
+          title: "Defecto",
+          value: { ...this.defect, repr: this.defect.type.code }
+        },
+        {
+          title: "Ubicación",
+          value: { ...this.location, repr: this.location.code }
+        },
+        {
+          title: "Vagoneta",
+          value: { ...this.wagon, repr: this.wagon.code } 
+        }
+      ];
+    }
+  }
+};
+</script>
+
+<style lang="scss" scoped>
+.classification-data {
+  display: flex;
+  justify-content: space-evenly;
+  width: 100%;
+}
+.classification-item {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  margin: 5px;
+  padding: 5px 15px;
+  text-align: center;
+
+  p {
+    margin: 0;
+    font-weight: bold;
+  }
+}
+</style>
