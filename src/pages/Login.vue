@@ -3,14 +3,7 @@
     <div class="login container-fluid h-100">
       <div class="row justify-content-center align-items-center h-100">
         <div class="col-4 form-container">
-          <div
-            v-if="loggingIn"
-            class="spinner-container d-flex justify-content-center align-items-center"
-          >
-            <div class="spinner-border text-dark" role="status">
-              <span class="sr-only">Cargando...</span>
-            </div>
-          </div>
+          <LoadingSpinner v-if="loggingIn" />
           <h3 class="pb-4 mx-auto text-center font-weight-bold font-italic">
             Sistema de Clasificado de Piezas
             <br>SCPI
@@ -46,8 +39,12 @@
 
 <script>
 import { mapState, mapActions } from "vuex";
+import LoadingSpinner from '@/components/LoadingSpinner.vue';
 
 export default {
+  components: {
+    LoadingSpinner,
+  },
   data() {
     return {
       username: "",
@@ -105,16 +102,5 @@ form {
       background-color: #fff;
     }
   }
-}
-.spinner-container {
-  position: fixed;
-  top: 0;
-  left: 0;
-  background-color: rgba(192, 192, 192, 0.363);
-  height: 100vh;
-  width: 100vw;
-  padding: 0;
-  margin: 0;
-  z-index: 100;
 }
 </style>
