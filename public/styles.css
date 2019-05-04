@@ -357,3 +357,24 @@ html .clear-completed:active {
 .btn-main {
   background-color: #47525e;
 }
+
+.bg-nude {
+  background-color: #f4f3ef;
+}
+
+.with-gutter [class*='col-']:not(:first-child):not(:last-child) {
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+.btn.btn-danger-custom {
+  color: #fff;
+  background-color: #d9534f;
+  border-color: #d43f3a;
+}
+
+.btn.btn-danger-custom:hover,
+.btn.btn-danger-custom:active {
+  background-color: #c9302c;
+  border-color: #ac2925;
+}
