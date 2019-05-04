@@ -43,7 +43,7 @@ export default new Vuex.Store({
         commit('loginFinish', r.data);
       })
       .catch((e) => {
-        commit('loginFinish', e.response.data);
+        commit('loginFinish', { error: e.message });
       })
     },
     doLogout({ commit }) {
