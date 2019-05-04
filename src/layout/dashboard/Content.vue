@@ -1,6 +1,6 @@
 <template>
   <div class="content">
-    <div class="container-fluid">
+    <div class="container">
         <transition name="fade" mode="out-in">
           <!-- your content here -->
           <router-view></router-view>
