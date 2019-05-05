@@ -35,9 +35,9 @@ export default {
   data() {
     return {
       oven: this.shift.currentOven,
-      castOp: this.shift.currentOven.castOperator,
-      coatOp: this.shift.currentOven.coatOperator,
-      polishOp: this.shift.currentOven.polishOperator
+      castOp: this.shift.currentOven.wagons[0].castOperator,
+      coatOp: this.shift.currentOven.wagons[0].coatOperator,
+      polishOp: this.shift.currentOven.wagons[0].polishOperator
     };
   },
   computed: {

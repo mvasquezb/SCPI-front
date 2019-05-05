@@ -1,7 +1,7 @@
 <template>
   <div class="wagon-container">
     <p v-for="wagon in wagons" class="wagon bg-nude" :key="wagon.id">
-      {{ wagon.code }}
+      Vagoneta {{ wagon.code }}
     </p>
   </div>
 </template>

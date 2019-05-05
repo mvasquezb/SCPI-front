@@ -1,58 +1,62 @@
 <template>
-  <div v-if="hasOpenShift" class="home bg-white">
-    <div class="row">
-      <div class="col-12 text-center">
-        <h4>Turno {{ shift.code }}</h4>
-      </div>
-    </div>
-    <div class="row top-content">
-      <div class="col-10 bg-nude general-info">
-        <div class="row bg-white general-info-tools">
-          <OvenData :shift="shift"/>
-        </div>
-        <div class="row bg-white general-info-tools">
-          <ClassificationData :classification="currentData"/>
+  <div>
+    <div v-if="hasOpenShift" class="home bg-white">
+      <div class="row">
+        <div class="col-12 text-center">
+          <h4>Turno {{ shift.code }}</h4>
         </div>
       </div>
-      <div class="col-2 bg-nude pieces-indicator">
-        <DataIndicactor title="Nro. Piezas" :value="43"/>
-      </div>
-    </div>
-    <div class="row bottom-container">
-      <div class="col-12">
-        <div class="row bg-nude">
-          <Oven v-for="oven in visibleOvens" class="col-md-6 oven" :oven="oven" :key="oven.id"/>
-        </div>
-        <div class="row bg-nude shift-info-actions">
-          <div class="col-md-9 bg-white d-flex piece-counters">
-            <ClassifiedCounter
-              v-for="(value, name, index) in classifiedPieces"
-              :key="index"
-              :title="name"
-              :value="value"
-            />
+      <div class="row top-content">
+        <div class="col-10 bg-nude general-info">
+          <div class="row bg-white general-info-tools">
+            <OvenData :shift="shift"/>
           </div>
-          <div class="col-md-3 text-center">
-            <button class="btn btn-end-shift btn-danger-custom">Terminar Turno</button>
+          <div class="row bg-white general-info-tools">
+            <ClassificationData :classification="currentData"/>
           </div>
         </div>
+        <div class="col-2 bg-nude pieces-indicator">
+          <DataIndicactor title="Nro. Piezas" :value="43"/>
+        </div>
+      </div>
+      <div class="row bottom-container">
+        <div class="col-12">
+          <div class="row bg-nude">
+            <Oven v-for="oven in visibleOvens" class="col-md-6 oven" :oven="oven" :key="oven.id"/>
+          </div>
+          <div class="row bg-nude shift-info-actions">
+            <div class="col-md-9 bg-white d-flex piece-counters">
+              <ClassifiedCounter
+                v-for="(value, name, index) in classifiedPieces"
+                :key="index"
+                :title="name"
+                :value="value"
+              />
+            </div>
+            <div class="col-md-3 text-center">
+              <button class="btn btn-end-shift btn-danger-custom">Terminar Turno</button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-  <div v-else class="text-center">
-    <h4>Por favor, inicie un turno para poder acceder a esta sección</h4>
-    <button class="btn btn-info">Iniciar Turno</button>
+    <div v-else-if="!creatingShift" class="text-center">
+      <h4>Por favor, inicie un turno para poder acceder a esta sección</h4>
+      <button class="btn btn-info" @click="createShiftStart">Iniciar Turno</button>
+    </div>
+    <CreateShiftForm v-if="creatingShift" class="form-wizard"/>
   </div>
 </template>
 
 <script lang="js">
+import { mapState, mapActions } from 'vuex';
 import { Component, Vue } from 'vue-property-decorator';
 import Oven from '@/components/Oven.vue';
 import DataIndicactor from '@/components/DataIndicator.vue';
 import ClassifiedCounter from '@/components/ClassifiedCounter.vue';
 import OvenData from '@/components/OvenData.vue';
 import ClassificationData from '@/components/ClassificationData.vue';
-// import http from '@/http';
+import CreateShiftForm from '@/components/CreateShiftForm.vue';
 
 @Component({
   components: {
@@ -60,45 +64,19 @@ import ClassificationData from '@/components/ClassificationData.vue';
     DataIndicactor,
     ClassifiedCounter,
     OvenData,
-    ClassificationData
+    ClassificationData,
+    CreateShiftForm,
   },
   computed: {
-    visibleOvens() {
-      return this.ovens.slice(0, 1);
-    },
-    currentData() {
-      return {
-        quantity: this.classificationData.quantity,
-        wagon: this.classificationData.productionWagon,
-        defect: this.classificationData.currentDefect,
-        location: this.classificationData.location,
-      };
-    },
-    hasOpenShift() {
-      return !!this.shift;
-    }
-  },
-  mounted() {
-    // Check open shfit
-    this.checkHasOpenShift();
+    ...mapState(['factoryOvens', 'creatingShift']),
+    shift: mapState(['currentShift']).currentShift,
   },
   methods: {
-    checkHasOpenShift() {
-      this.shift = null;
-    }
-  }
-})
-export default class Home extends Vue {
-  shift = {}
-  ovens = []
-  classifiedPieces = {}
-
-  created() {
-    // http.get(`/shift/${shift.id}/ovens`).then((res) => this.ovens = res.data);
-    this.shift = {
-      id: 1,
-      code: "CAS12",
-      productModel: {
+    ...mapActions(['loadFactoryOvens']),
+  },
+  watch: {
+    hasOpenShift() {
+      this.shift.productModel = {
         id: 1,
         code: "MOD12",
         color: {
@@ -106,46 +84,19 @@ export default class Home extends Vue {
           name: "Blanco",
           hex: "#fff"
         },
-      },
-    };
+      };
+      this.shift.currentOven = this.factoryOvens[0];
+      this.classificationData.productionWagon = this.shift.currentOven.wagons[0];
+    }
+  }
+})
+export default class Home extends Vue {
+  classifiedPieces = {};
+  classificationData = {};
 
-    this.ovens = [
-      {
-        id: 1,
-        code: "SITI",
-        wagons: [
-          {
-            id: 1,
-            code: "Vagoneta 44"
-          },
-          {
-            id: 2,
-            code: "Vagoneta 45"
-          },
-          {
-            id: 3,
-            code: "Vagoneta 46"
-          },
-          {
-            id: 4,
-            code: "Vagoneta 47"
-          },
-        ],
-        castOperator: {
-          id: 1,
-          code: "EMP1"
-        },
-        coatOperator: {
-          id: 2,
-          code: "EMP2"
-        },
-        polishOperator: {
-          id: 3,
-          code: "EMP3"
-        }
-      }
-    ];
-
+  created() {
+    this.loadFactoryOvens();
+    
     this.classifiedPieces = {
       "estandar": 21,
       "comercial": 11,
@@ -154,26 +105,10 @@ export default class Home extends Vue {
       "evaluacion": 3
     };
 
-    this.shift.currentOven = this.ovens[0];
-
     this.classificationData = {
-      id: 1,
-      quantity: 2,
-      productionWagon: this.shift.currentOven.wagons[0],
-      currentDefect: {
         id: 1,
-        type: {
-          id: 1,
-          code: 'QE',
-        },
-        location: {
-          id: 1,
-          code: '001',
-          name: 'Aleta'
-        }
-      },
-      defects: [
-        {
+        quantity: 2,
+        currentDefect: {
           id: 1,
           type: {
             id: 1,
@@ -184,9 +119,43 @@ export default class Home extends Vue {
             code: '001',
             name: 'Aleta'
           }
-        }
-      ],
+        },
+        defects: [
+          {
+            id: 1,
+            type: {
+              id: 1,
+              code: 'QE',
+            },
+            location: {
+              id: 1,
+              code: '001',
+              name: 'Aleta'
+            }
+          }
+        ],
+      };
+  }
+
+  createShiftStart() {
+    this.$store.state.creatingShift = true;
+  }
+
+  get visibleOvens() {
+    return this.factoryOvens.slice(0, 1);
+  }
+  
+  get currentData() {
+    return {
+      quantity: this.classificationData.quantity,
+      wagon: this.classificationData.productionWagon,
+      defect: this.classificationData.currentDefect,
+      location: this.classificationData.location,
     };
+  }
+
+  get hasOpenShift() {
+    return this.shift != null;
   }
 }
 </script>
@@ -252,5 +221,9 @@ export default class Home extends Vue {
       width: 100%;
     }
   }
+}
+
+.form-wizard {
+  background-color: white;
 }
 </style>
