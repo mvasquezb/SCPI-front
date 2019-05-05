@@ -20,6 +20,9 @@ export default new Vuex.Store({
     operationError: null,
     operationSuccessful: false,
     currentClassification: null,
+    productFamilies: {},
+    productModels: {},
+    classifications: [],
   },
   mutations: {
     initialiseStore(state) {
@@ -47,10 +50,15 @@ export default new Vuex.Store({
       state.factoryOvens = ovens;
     },
     addStartWagon: (state, wagon) => {
-      state.tmpStartWagons[wagon.ovenId] = wagon.wagon;
+      state.tmpStartWagons = {
+        ...state.tmpStartWagons,
+        [wagon.ovenId]: wagon.wagon
+      };
     },
     operationStart: (state) => {
       state.loading = true;
+      state.operationError = false;
+      state.operationSuccessful = false;
     },
     createShift: (state, result) => {
       state.loading = false;
@@ -63,7 +71,35 @@ export default new Vuex.Store({
         state.tmpStartWagons = null;
         state.creatingShift = false;
       }
-    }
+    },
+    loadProductFamilies: (state, result) => {
+      state.loading = false;
+      state.operationError = result.error;
+      state.operationSuccessful = result.error == null;
+      if (state.operationSuccessful) {
+        state.productFamilies = result.data;
+      }
+    },
+    loadProductModels: (state, result) => {
+      state.loading = false;
+      state.operationError = result.error;
+      state.operationSuccessful = result.error == null;
+      if (state.operationSuccessful) {
+        state.productModels = {
+          ...state.productModels,
+          [result.famId]: result.data,
+        };
+      }
+    },
+    selectCurrentModel: (state, model) => {
+      // save current classification
+      if (state.currentClassification) {
+        state.classifications.push(state.currentClassification);
+      }
+      state.currentClassification = {
+        productModel: model,
+      };
+    },
   },
   actions: {
     doLogin({ commit }, loginData) {
@@ -164,7 +200,22 @@ export default new Vuex.Store({
       commit('operationStart');
       http.post(`/users/${this.state.currentUser.id}/create-shift`, { shiftCode: this.state.tmpShiftCode })
         .then((r) => commit('createShift', r))
-        .catch((e) => commit('createShift', { error: e }))
+        .catch((e) => commit('createShift', { error: e }));
+    },
+    loadProductFamilies({ commit }) {
+      commit('operationStart');
+      http.get('/product-families')
+        .then((r) => commit('loadProductFamilies', r))
+        .catch((e) => commit('loadProductFamilies', { error: e }));
+    },
+    loadModelsForFamily({ commit }, productFamily) {
+      commit('operationStart');
+      http.get(`/product-families/${productFamily.id}/models?not-empty`)
+        .then((r) => commit('loadProductModels', { ...r, famId: productFamily.id }))
+        .catch((e) => commit('loadProductModels', { error: e }));
+    },
+    selectModel({ commit }, selectedModel) {
+      commit('selectCurrentModel', selectedModel);
     }
   }
 });

@@ -9,8 +9,7 @@
           <b-form-group
             id="shift-code"
             label="Clave Turno"
-            label-for="shift-input"
-            
+            label-for="shift-input" 
           >
             <b-form-input
               ref="input"

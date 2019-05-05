@@ -9,7 +9,7 @@
       <div class="row top-content">
         <div class="col-10 bg-nude general-info">
           <div class="row bg-white general-info-tools">
-            <OvenData :shift="shift"/>
+            <OvenData :data="ovenData"/>
           </div>
           <div class="row bg-white general-info-tools">
             <ClassificationData :classification="currentData"/>
@@ -68,7 +68,7 @@ import CreateShiftForm from '@/components/CreateShiftForm.vue';
     CreateShiftForm,
   },
   computed: {
-    ...mapState(['factoryOvens', 'creatingShift']),
+    ...mapState(['factoryOvens', 'creatingShift', 'currentClassification']),
     shift: mapState(['currentShift']).currentShift,
   },
   methods: {
@@ -76,16 +76,6 @@ import CreateShiftForm from '@/components/CreateShiftForm.vue';
   },
   watch: {
     hasOpenShift() {
-      this.shift.productModel = {
-        id: 1,
-        code: "MOD12",
-        color: {
-          id: 1,
-          name: "Blanco",
-          hex: "#fff"
-        },
-      };
-      this.shift.currentOven = this.factoryOvens[0];
       this.classificationData.productionWagon = this.shift.currentOven.wagons[0];
     }
   }
@@ -156,6 +146,18 @@ export default class Home extends Vue {
 
   get hasOpenShift() {
     return this.shift != null;
+  }
+
+  get ovenData() {
+    return {
+      productModel: this.currentClassification.productModel,
+      color: {
+        id: 1,
+        name: "Blanco",
+        hex: "#fff"
+      },
+      currentOven: this.factoryOvens[0],
+    }
   }
 }
 </script>

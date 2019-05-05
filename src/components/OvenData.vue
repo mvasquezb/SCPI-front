@@ -1,12 +1,12 @@
 <template>
   <div class="bg-white oven-data">
-    <div class="bg-nude oven-item">
+    <div class="bg-nude oven-item btn-select-model" @click="() => $router.push('model-selection')">
       <p>Modelo</p>
-      <p>{{ shift.productModel.code }}</p>
+      <p>{{ data.productModel.code }}</p>
     </div>
     <div class="bg-nude oven-item">
       <p>Color</p>
-      <p>{{ shift.productModel.color.name }}</p>
+      <p>{{ data.color.name }}</p>
     </div>
     <DataIndicator
       v-for="(item, index) in visibleInfoItems"
@@ -27,17 +27,17 @@ export default {
     DataIndicator
   },
   props: {
-    shift: {
+    data: {
       type: Object,
       default: () => {}
     }
   },
   data() {
     return {
-      oven: this.shift.currentOven,
-      castOp: this.shift.currentOven.wagons[0].castOperator,
-      coatOp: this.shift.currentOven.wagons[0].coatOperator,
-      polishOp: this.shift.currentOven.wagons[0].polishOperator
+      oven: this.data.currentOven,
+      castOp: this.data.currentOven.wagons[0].castOperator,
+      coatOp: this.data.currentOven.wagons[0].coatOperator,
+      polishOp: this.data.currentOven.wagons[0].polishOperator
     };
   },
   computed: {
@@ -83,5 +83,8 @@ export default {
     margin: 0;
     font-weight: bold;
   }
+}
+.btn-select-model:hover {
+  cursor: pointer;
 }
 </style>
