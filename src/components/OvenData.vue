@@ -60,7 +60,6 @@ export default {
   },
   methods: {
     runItemAction(item) {
-      console.log(item);
       if (item.action) {
         this.$router.push(item.action);
       }

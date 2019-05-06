@@ -148,13 +148,12 @@ export default {
       }
       return "Volver";
     },
-    backHandler(index, prevTab, props) {
+    backHandler(index, prevTab) {
       if (index == 0) {
         this.$router.back();
         return;
       }
       prevTab();
-      console.log(props);
     }
   },
   mounted() {
