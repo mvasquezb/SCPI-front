@@ -151,11 +151,7 @@ export default class Home extends Vue {
   get ovenData() {
     return {
       productModel: this.currentClassification.productModel,
-      color: {
-        id: 1,
-        name: "Blanco",
-        hex: "#fff"
-      },
+      color: this.currentClassification.color,
       currentOven: this.factoryOvens[0],
     }
   }

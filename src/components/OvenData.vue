@@ -1,10 +1,10 @@
 <template>
   <div class="bg-white oven-data">
-    <div class="bg-nude oven-item btn-select-model" @click="() => $router.push('model-selection')">
+    <div class="bg-nude oven-item btn-action" @click="() => $router.push('model-selection')">
       <p>Modelo</p>
       <p>{{ data.productModel.code }}</p>
     </div>
-    <div class="bg-nude oven-item">
+    <div class="bg-nude oven-item btn-action" @click="() => $router.push('color-selection')">
       <p>Color</p>
       <p>{{ data.color.name }}</p>
     </div>
@@ -84,7 +84,8 @@ export default {
     font-weight: bold;
   }
 }
-.btn-select-model:hover {
+
+.btn-action:hover {
   cursor: pointer;
 }
 </style>

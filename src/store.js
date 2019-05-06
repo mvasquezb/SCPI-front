@@ -23,6 +23,7 @@ export default new Vuex.Store({
     productFamilies: {},
     productModels: {},
     classifications: [],
+    colors: {},
   },
   mutations: {
     initialiseStore(state) {
@@ -59,6 +60,13 @@ export default new Vuex.Store({
       state.loading = true;
       state.operationError = false;
       state.operationSuccessful = false;
+    },
+    operationFinish: (state) => {
+      state.loading = false;
+    },
+    operationError: (state, e) => {
+      state.operationError = e;
+      state.operationSuccessful = e == null;
     },
     createShift: (state, result) => {
       state.loading = false;
@@ -100,6 +108,15 @@ export default new Vuex.Store({
         productModel: model,
       };
     },
+    colorsLoaded: (state, res) => {
+      state.colors = res.data;
+    },
+    colorSelected: (state, color) => {
+      state.currentClassification = {
+        ...state.currentClassification,
+        color: color
+      };
+    }
   },
   actions: {
     doLogin({ commit }, loginData) {
@@ -216,6 +233,16 @@ export default new Vuex.Store({
     },
     selectModel({ commit }, selectedModel) {
       commit('selectCurrentModel', selectedModel);
+    },
+    loadColors({ commit }) {
+      commit('operationStart');
+      http.get('/colors')
+        .then((r) => commit('colorsLoaded', r))
+        .catch((e) => commit('operationError', e))
+        .finally(() => commit('operationFinish'));
+    },
+    selectColor({ commit }, color) {
+      commit('colorSelected', color);
     }
   }
 });

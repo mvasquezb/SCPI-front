@@ -2,7 +2,7 @@
   <div class="model-selection bg-white">
     <LoadingSpinner v-if="loading"/>
     <form-wizard
-      title="Seleccionar modelo de Producto a clasificar"
+      title="Seleccionar modelo de producto a clasificar"
       subtitle
       nextButtonText="Siguiente"
       backButtonText="Atrás"
@@ -47,11 +47,35 @@
               >
                 <p>{{ mod.name }}</p>
               </div>
-              <h4 v-if="!familyModels.length">Esta familia de productos no tiene productos disponibles</h4>
+              <h4
+                v-if="!familyModels.length"
+              >Esta familia de productos no tiene productos disponibles</h4>
             </div>
           </div>
         </div>
       </tab-content>
+
+      <template slot="footer" slot-scope="props">
+        <div class="wizard-footer-left">
+          <wizard-button
+            @click.native="backHandler(props.activeTabIndex, props.prevTab.bind(props), props)"
+            class="btn btn-default"
+          >{{ prevButtonText(props.activeTabIndex) }}</wizard-button>
+        </div>
+        <div class="wizard-footer-right">
+          <wizard-button
+            v-if="!props.isLastStep"
+            @click.native="props.nextTab()"
+            class="wizard-footer-right btn btn-default"
+          >Siguiente</wizard-button>
+
+          <wizard-button
+            v-else
+            @click.native="onComplete"
+            class="wizard-footer-right finish-button btn btn-default"
+          >{{props.isLastStep ? 'Finalizar' : 'Siguiente'}}</wizard-button>
+        </div>
+      </template>
     </form-wizard>
   </div>
 </template>
@@ -67,7 +91,7 @@ export default {
   data() {
     return {
       selectedFamily: null,
-      selectedModel: null,
+      selectedModel: null
     };
   },
   computed: {
@@ -79,11 +103,12 @@ export default {
       "operationSuccessful"
     ]),
     familyModels() {
-      console.log(this.selectedFamily);
-      if (this.selectedFamily === null || !this.productModels[this.selectedFamily.id]) {
+      if (
+        this.selectedFamily === null ||
+        !this.productModels[this.selectedFamily.id]
+      ) {
         return [];
       }
-      console.log (this.productModels[this.selectedFamily.id]);
       return this.productModels[this.selectedFamily.id];
     },
     hasFamilyError() {
@@ -94,7 +119,11 @@ export default {
     }
   },
   methods: {
-    ...mapActions(["loadProductFamilies", "loadModelsForFamily", "selectModel"]),
+    ...mapActions([
+      "loadProductFamilies",
+      "loadModelsForFamily",
+      "selectModel"
+    ]),
     loadProductModels() {
       if (this.hasFamilyError) {
         return false;
@@ -110,12 +139,25 @@ export default {
         return false;
       }
       this.selectModel(this.selectedModel);
-      this.$router.push('home');
+      this.$router.push("home");
       return true;
+    },
+    prevButtonText(index) {
+      if (index > 0) {
+        return "Atrás";
+      }
+      return "Volver";
+    },
+    backHandler(index, prevTab, props) {
+      if (index == 0) {
+        this.$router.back();
+        return;
+      }
+      prevTab();
+      console.log(props);
     }
   },
   mounted() {
-    this.$store.state.loading = false;
     if (Object.keys(this.productFamilies).length === 0) {
       this.loadProductFamilies();
     }
@@ -129,6 +171,7 @@ export default {
   display: flex;
   justify-content: center;
   overflow-y: auto;
+  margin-right: 15px;
 
   &.error {
     border: 1px solid red;
@@ -150,7 +193,7 @@ export default {
   }
 
   &:hover {
-    background-color: #ccc;
+    background-color: #ccc7;
     cursor: pointer;
   }
 
@@ -158,6 +201,15 @@ export default {
     margin: 0;
     max-width: 100%;
     text-overflow: ellipsis;
+  }
+}
+
+.model-selection {
+  .vue-form-wizard .wizard-btn {
+    margin-top: 10px;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    background-color: #66615B;
   }
 }
 </style>

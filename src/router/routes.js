@@ -5,6 +5,7 @@ import DashboardLayout from '@/layout/dashboard/DashboardLayout.vue';
 import NotFound from "@/pages/NotFoundPage.vue";
 import Login from '@/pages/Login.vue';
 import ModelSelection from '@/views/ModelSelection.vue';
+import ColorSelection from '@/views/ColorSelection.vue';
 
 Vue.use(Router)
 
@@ -31,7 +32,12 @@ const routes = [
         path: 'model-selection',
         name: 'model-selection',
         component: ModelSelection,
-      }
+      },
+      {
+        path: 'color-selection',
+        name: 'color-selection',
+        component: ColorSelection,
+      },
     ]
   },
   {
