@@ -11,10 +11,11 @@
     <DataIndicator
       v-for="(item, index) in visibleInfoItems"
       :key="index"
-      class="bg-nude oven-item"
+      class="bg-nude oven-item btn-action"
       :title="item.title"
-      :value="item.value.code"
+      :value="item.value.code || '\xa0'"
       size="small"
+      @click.native="runItemAction(item)"
     />
   </div>
 </template>
@@ -32,34 +33,37 @@ export default {
       default: () => {}
     }
   },
-  data() {
-    return {
-      oven: this.data.currentOven,
-      castOp: this.data.currentOven.wagons[0].castOperator,
-      coatOp: this.data.currentOven.wagons[0].coatOperator,
-      polishOp: this.data.currentOven.wagons[0].polishOperator
-    };
-  },
   computed: {
     visibleInfoItems() {
       return [
         {
           title: "Horno",
-          value: this.oven
+          value: this.data.currentOven,
         },
         {
           title: "Colador",
-          value: this.castOp
+          value: this.data.castOperator,
+          action: 'cast-selection',
         },
         {
           title: "Barnizador",
-          value: this.coatOp
+          value: this.data.coatOperator,
+          action: 'coat-selection',
         },
         {
           title: "Pulidor",
-          value: this.polishOp
+          value: this.data.polishOperator,
+          action: 'polish-selection',
         }
       ];
+    }
+  },
+  methods: {
+    runItemAction(item) {
+      console.log(item);
+      if (item.action) {
+        this.$router.push(item.action);
+      }
     }
   }
 };

@@ -24,6 +24,7 @@ export default new Vuex.Store({
     productModels: {},
     classifications: [],
     colors: {},
+    operators: [],
   },
   mutations: {
     initialiseStore(state) {
@@ -122,7 +123,43 @@ export default new Vuex.Store({
         ...state.currentClassification,
         currentWagon: wagon,
       };
-    }
+    },
+    operatorsLoaded: (state, operators) => {
+      state.operators = operators;
+    },
+    castOperatorSelected: (state, operatorCode) => {
+      let operator = state.operators.filter((op) => op.code == operatorCode);
+      if (!operator.length) {
+        operator = state.operators.filter((op) => op.code == 'colador1')[0];
+        operator = { ...operator, code: operatorCode };
+      }
+      state.currentClassification = {
+        ...state.currentClassification,
+        castOperator: operator,
+      };
+    },
+    coatOperatorSelected: (state, operatorCode) => {
+      let operator = state.operators.filter((op) => op.code == operatorCode);
+      if (!operator.length) {
+        operator = state.operators.filter((op) => op.code == 'barnizador1')[0];
+        operator = { ...operator, code: operatorCode };
+      }
+      state.currentClassification = {
+        ...state.currentClassification,
+        coatOperator: operator,
+      };
+    },
+    polishOperatorSelected: (state, operatorCode) => {
+      let operator = state.operators.filter((op) => op.code == operatorCode);
+      if (!operator.length) {
+        operator = state.operators.filter((op) => op.code == 'pulidor1')[0];
+        operator = { ...operator, code: operatorCode };
+      }
+      state.currentClassification = {
+        ...state.currentClassification,
+        polishOperator: operator,
+      };
+    },
   },
   actions: {
     doLogin({ commit }, loginData) {
@@ -252,6 +289,23 @@ export default new Vuex.Store({
     },
     setCurrentWagon({ commit }, wagon) {
       commit('currentWagonSet', wagon);
+    },
+    loadOperators({ commit }) {
+      commit('operationStart');
+      http.get('/users')
+        .then((r) => r.data.filter((op) => op.role.id == 3))
+        .then((r) => commit('operatorsLoaded', r))
+        .catch((e) => commit('operationError', e))
+        .finally(() => commit('operationFinish'));
+    },
+    selectCastOperator({ commit }, operatorCode) {
+      commit('castOperatorSelected', operatorCode);
+    },
+    selectCoatOperator({ commit }, operatorCode) {
+      commit('coatOperatorSelected', operatorCode);
+    },
+    selectPolishOperator({ commit }, operatorCode) {
+      commit('polishOperatorSelected', operatorCode);
     }
   }
 });

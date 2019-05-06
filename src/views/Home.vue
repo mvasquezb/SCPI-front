@@ -157,6 +157,9 @@ export default class Home extends Vue {
       productModel: this.currentClassification.productModel,
       color: this.currentClassification.color,
       currentOven: this.factoryOvens[0],
+      coatOperator: this.currentClassification.coatOperator || {},
+      castOperator: this.currentClassification.castOperator || {},
+      polishOperator: this.currentClassification.polishOperator || {},
     };
   }
 
