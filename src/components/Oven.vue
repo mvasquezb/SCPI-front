@@ -11,8 +11,8 @@
     <div class="row">
       <WagonList class="col-9 wagons" :wagons="oven.wagons" />
       <div class="col-3 wagon-indicators">
-        <DataIndicator title="Vagoneta Inicial" :value="44" />
-        <DataIndicator title="Vagoneta Actual" :value="48" />
+        <DataIndicator title="Vagoneta Inicial" :value="startWagon" />
+        <DataIndicator title="Vagoneta Actual" :value="currentWagon" />
       </div>
     </div>
     <div class="row d-flex oven-actions">
@@ -28,6 +28,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 import WagonList from '@/components/WagonList.vue';
 import DataIndicator from '@/components/DataIndicator.vue';
 
@@ -41,6 +42,15 @@ export default {
   components: {
     WagonList,
     DataIndicator
+  },
+  computed: {
+    ...mapState(['currentClassification', 'startWagonsPerOven']),
+    startWagon() {
+      return this.startWagonsPerOven[this.oven.id].code;
+    },
+    currentWagon() {
+      return this.currentClassification.currentWagon.code;
+    }
   }
 };
 </script>

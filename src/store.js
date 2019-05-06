@@ -75,7 +75,7 @@ export default new Vuex.Store({
       if (state.operationSuccessful) {
         state.currentShift = result.data;
         state.tmpShiftCode = null;
-        state.startWagonsPerOven = state.tmpStartWagons;
+        state.startWagonsPerOven = { ...state.tmpStartWagons };
         state.tmpStartWagons = null;
         state.creatingShift = false;
       }
