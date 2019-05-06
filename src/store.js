@@ -116,6 +116,12 @@ export default new Vuex.Store({
         ...state.currentClassification,
         color: color
       };
+    },
+    currentWagonSet: (state, wagon) => {
+      state.currentClassification = {
+        ...state.currentClassification,
+        currentWagon: wagon,
+      };
     }
   },
   actions: {
@@ -243,6 +249,9 @@ export default new Vuex.Store({
     },
     selectColor({ commit }, color) {
       commit('colorSelected', color);
+    },
+    setCurrentWagon({ commit }, wagon) {
+      commit('currentWagonSet', wagon);
     }
   }
 });

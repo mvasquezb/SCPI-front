@@ -12,11 +12,11 @@
             <OvenData :data="ovenData"/>
           </div>
           <div class="row bg-white general-info-tools">
-            <ClassificationData :classification="currentData"/>
+            <ClassificationData :classification="currentClassData"/>
           </div>
         </div>
         <div class="col-2 bg-nude pieces-indicator">
-          <DataIndicactor title="Nro. Piezas" :value="43"/>
+          <DataIndicactor title="Nro. Piezas" :value="totalClassifiedPieces"/>
         </div>
       </div>
       <div class="row bottom-container">
@@ -27,7 +27,7 @@
           <div class="row bg-nude shift-info-actions">
             <div class="col-md-9 bg-white d-flex piece-counters">
               <ClassifiedCounter
-                v-for="(value, name, index) in classifiedPieces"
+                v-for="(value, name, index) in pieceClassifications"
                 :key="index"
                 :title="name"
                 :value="value"
@@ -72,22 +72,22 @@ import CreateShiftForm from '@/components/CreateShiftForm.vue';
     shift: mapState(['currentShift']).currentShift,
   },
   methods: {
-    ...mapActions(['loadFactoryOvens']),
+    ...mapActions(['loadFactoryOvens', 'setCurrentWagon']),
   },
   watch: {
     hasOpenShift() {
-      this.classificationData.productionWagon = this.shift.currentOven.wagons[0];
+      this.setCurrentWagon(this.currentClassification.currentOven.wagons[0]);
     }
   }
 })
 export default class Home extends Vue {
-  classifiedPieces = {};
+  pieceClassifications = {};
   classificationData = {};
 
   created() {
     this.loadFactoryOvens();
     
-    this.classifiedPieces = {
+    this.pieceClassifications = {
       "estandar": 21,
       "comercial": 11,
       "rotura": 7,
@@ -96,9 +96,22 @@ export default class Home extends Vue {
     };
 
     this.classificationData = {
+      id: 1,
+      quantity: 2,
+      currentDefect: {
         id: 1,
-        quantity: 2,
-        currentDefect: {
+        type: {
+          id: 1,
+          code: 'QE',
+        },
+        location: {
+          id: 1,
+          code: '001',
+          name: 'Aleta'
+        }
+      },
+      defects: [
+        {
           id: 1,
           type: {
             id: 1,
@@ -109,22 +122,13 @@ export default class Home extends Vue {
             code: '001',
             name: 'Aleta'
           }
-        },
-        defects: [
-          {
-            id: 1,
-            type: {
-              id: 1,
-              code: 'QE',
-            },
-            location: {
-              id: 1,
-              code: '001',
-              name: 'Aleta'
-            }
-          }
-        ],
-      };
+        }
+      ],
+    };
+  }
+
+  mounted() {
+    this.setCurrentWagon(this.ovenData.currentOven.wagons[0]);
   }
 
   createShiftStart() {
@@ -135,10 +139,10 @@ export default class Home extends Vue {
     return this.factoryOvens.slice(0, 1);
   }
   
-  get currentData() {
+  get currentClassData() {
     return {
       quantity: this.classificationData.quantity,
-      wagon: this.classificationData.productionWagon,
+      wagon: this.currentClassification.currentWagon,
       defect: this.classificationData.currentDefect,
       location: this.classificationData.location,
     };
@@ -153,7 +157,11 @@ export default class Home extends Vue {
       productModel: this.currentClassification.productModel,
       color: this.currentClassification.color,
       currentOven: this.factoryOvens[0],
-    }
+    };
+  }
+
+  get totalClassifiedPieces() {
+    return Object.values(this.pieceClassifications).reduce((acc, val) => acc + val);
   }
 }
 </script>
