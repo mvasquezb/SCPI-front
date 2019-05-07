@@ -25,6 +25,10 @@ export default new Vuex.Store({
     classifications: [],
     colors: {},
     operators: [],
+    defectAreas: [],
+    defectsPerArea: {},
+    tmpDefect: null,
+    pieceZones: {}
   },
   mutations: {
     initialiseStore(state) {
@@ -64,10 +68,10 @@ export default new Vuex.Store({
     },
     operationFinish: (state) => {
       state.loading = false;
+      state.operationSuccessful = state.operationError == null;
     },
     operationError: (state, e) => {
       state.operationError = e;
-      state.operationSuccessful = e == null;
     },
     createShift: (state, result) => {
       state.loading = false;
@@ -106,6 +110,7 @@ export default new Vuex.Store({
         state.classifications.push(state.currentClassification);
       }
       state.currentClassification = {
+        ...state.currentClassification,
         productModel: model,
       };
     },
@@ -160,6 +165,68 @@ export default new Vuex.Store({
         polishOperator: operator,
       };
     },
+    classificationCreated: (state, { oven, wagon }) => {
+      if (state.currentClassification.oven == oven && state.currentClassification.currentWagon == wagon) {
+        return;
+      }
+      state.classifications.push(state.currentClassification);
+      state.currentClassification = {
+        ...state.currentClassification,
+        currentWagon: wagon,
+        currentOven: oven,
+        pieceClassification: {},
+      };
+    },
+    classificationSaved: (state, classification) => {
+      state.classifications.push(classification);
+      state.currentClassification = {
+        ...state.currentClassification,
+        defects: [],
+        pieceClassification: {},
+      };
+    },
+    qualityLevelsLoaded: (state, qualities) => {
+      state.qualityLevels = qualities;
+    },
+    defectAreasLoaded: (state, areas) => {
+      state.defectAreas = areas;
+    },
+    defectsLoaded: (state, { area, defects }) => {
+      state.defectsPerArea = {
+        ...state.defectsPerArea,
+        [area.id]: defects,
+      };
+    },
+    defectAreaSelected: (state, area) => {
+      state.tmpDefect = {
+        ...state.tmpDefect,
+        defectArea: area,
+      };
+    },
+    defectSelected: (state, defect) => {
+      state.tmpDefect = {
+        ...state.tmpDefect,
+        defectType: defect,
+      };
+    },
+    pieceZonesLoaded: (state, pieceZones) => {
+      state.pieceZones = pieceZones;
+    },
+    pieceZoneSelected: (state, zone) => {
+      state.tmpDefect = {
+        ...state.tmpDefect,
+        affectedZone: zone,
+      };
+    },
+    defectSaved: (state, defect) => {
+      let defects = state.currentClassification.defects || [];
+      defects.push(defect);
+      state.currentClassification = {
+        ...state.currentClassification,
+        defects: defects,
+      };
+      state.tmpDefect = null;
+    },
   },
   actions: {
     doLogin({ commit }, loginData) {
@@ -180,81 +247,11 @@ export default new Vuex.Store({
       commit('addStartWagon', startWagon);
     },
     loadFactoryOvens({ commit }) {
-      // http.get(`/shift/${shift.id}/ovens`)
-      // .then((res) => commit('factoryOvensLoaded', res.data));
-      let ovens = [
-        {
-          id: 1,
-          code: "SITI",
-          wagons: [
-            {
-              id: 1,
-              code: "44",
-              castOperator: {
-                id: 1,
-                code: "EMP1"
-              },
-              coatOperator: {
-                id: 2,
-                code: "EMP2"
-              },
-              polishOperator: {
-                id: 3,
-                code: "EMP3"
-              }
-            },
-            {
-              id: 2,
-              code: "45",
-              castOperator: {
-                id: 1,
-                code: "EMP1"
-              },
-              coatOperator: {
-                id: 2,
-                code: "EMP2"
-              },
-              polishOperator: {
-                id: 3,
-                code: "EMP3"
-              }
-            },
-            {
-              id: 3,
-              code: "46",
-              castOperator: {
-                id: 1,
-                code: "EMP1"
-              },
-              coatOperator: {
-                id: 2,
-                code: "EMP2"
-              },
-              polishOperator: {
-                id: 3,
-                code: "EMP3"
-              }
-            },
-            {
-              id: 4,
-              code: "47",
-              castOperator: {
-                id: 1,
-                code: "EMP1"
-              },
-              coatOperator: {
-                id: 2,
-                code: "EMP2"
-              },
-              polishOperator: {
-                id: 3,
-                code: "EMP3"
-              }
-            },
-          ]
-        }
-      ];
-      commit('factoryOvensLoaded', ovens);
+      commit('operationStart');
+      http.get(`/ovens`)
+        .then((res) => commit('factoryOvensLoaded', res.data))
+        .catch((e) => commit('operationError', e))
+        .finally(() => commit('operationFinish'));
     },
     createShift({ commit }) {
       commit('operationStart');
@@ -306,6 +303,56 @@ export default new Vuex.Store({
     },
     selectPolishOperator({ commit }, operatorCode) {
       commit('polishOperatorSelected', operatorCode);
+    },
+    createClassification({ commit }, payload) {
+      commit('classificationCreated', payload);
+    },
+    saveClassification({ commit }, classification) {
+      commit('classificationSaved', classification);
+    },
+    loadQualityLevels({ commit }) {
+      commit('operationStart');
+
+      http.get('/quality-levels')
+        .then((r) => commit('qualityLevelsLoaded', r.data))
+        .catch((e) => commit('operationError', e))
+        .finally(() => commit('operationFinish'));
+    },
+    loadDefectAreas({ commit }) {
+      commit('operationStart');
+
+      http.get('/defect-areas?not-empty')
+        .then((r) => commit('defectAreasLoaded', r.data))
+        .catch((e) => commit('operationError', e))
+        .finally(() => commit('operationFinish'));
+    },
+    loadDefectsForArea({ commit }, area) {
+      commit('operationStart');
+
+      http.get(`/defect-areas/${area.id}/defects`)
+        .then((r) => commit('defectsLoaded', { area, defects: r.data }))
+        .catch((e) => commit('operationError', e))
+        .finally(() => commit('operationFinish'));
+    },
+    selectDefectArea({ commit }, area) {
+      commit('defectAreaSelected', area);
+    },
+    selectDefect({ commit }, defect) {
+      commit('defectSelected', defect);
+    },
+    loadPieceZones({ commit }) {
+      commit('operationStart');
+
+      http.get(`/piece-zones`)
+        .then((r) => commit('pieceZonesLoaded', r.data))
+        .catch((e) => commit('operationError', e))
+        .finally(() => commit('operationFinish'));
+    },
+    selectPieceZone({ commit }, zone) {
+      commit('pieceZoneSelected', zone);
+    },
+    saveDefect({ commit }, defect) {
+      commit('defectSaved', defect);
     }
   }
 });

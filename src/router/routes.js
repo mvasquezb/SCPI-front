@@ -9,6 +9,10 @@ import ColorSelection from '@/views/ColorSelection.vue';
 import CoatSelection from '@/views/CoatSelection.vue';
 import CastSelection from '@/views/CastSelection.vue';
 import PolishSelection from '@/views/PolishSelection.vue';
+import QualityCheck from '@/views/QualityCheck.vue';
+import DefectAreaSelection from '@/views/DefectAreaSelection.vue';
+import DefectSelection from '@/views/DefectSelection.vue';
+import PieceZoneSelection from '@/views/PieceZoneSelection.vue';
 
 Vue.use(Router)
 
@@ -55,6 +59,26 @@ const routes = [
         path: 'cast-selection',
         name: 'cast-selection',
         component: CastSelection,
+      },
+      {
+        path: 'quality-check',
+        name: 'quality-check',
+        component: QualityCheck,
+      },
+      {
+        path: 'defect-area-selection',
+        name: 'defect-area-selection',
+        component: DefectAreaSelection,
+      },
+      {
+        path: 'defect-selection',
+        name: 'defect-selection',
+        component: DefectSelection,
+      },
+      {
+        path: 'pieceZone-selection',
+        name: 'pieceZone-selection',
+        component: PieceZoneSelection,
       },
     ]
   },

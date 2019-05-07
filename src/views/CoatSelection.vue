@@ -193,8 +193,6 @@ export default {
     font-size: 14px;
     font-weight: 600;
     min-width: 140px;
-    font-size: 14px;
-    font-weight: 600;
     text-align: center;
     vertical-align: middle;
     cursor: pointer;

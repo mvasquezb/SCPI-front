@@ -9,7 +9,7 @@
       </div>
     </div>
     <div class="row">
-      <WagonList class="col-9 wagons" :wagons="oven.wagons" />
+      <WagonList class="col-9 wagons" :wagons="oven.wagons" @wagonSelect="selectWagon" />
       <div class="col-3 wagon-indicators">
         <DataIndicator title="Vagoneta Inicial" :value="startWagon" />
         <DataIndicator title="Vagoneta Actual" :value="currentWagon" />
@@ -17,7 +17,7 @@
     </div>
     <div class="row d-flex oven-actions">
       <div class="col-5 text-center">
-        <button class="btn btn-main">Aceptar</button>
+        <button class="btn btn-main" @click="startQualityCheck">Aceptar</button>
       </div>
       <div class="col-2"></div>
       <div class="col-5 text-center">
@@ -28,7 +28,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { mapState, mapActions } from 'vuex';
 import WagonList from '@/components/WagonList.vue';
 import DataIndicator from '@/components/DataIndicator.vue';
 
@@ -38,6 +38,11 @@ export default {
       type: Object,
       required: true,
     },
+  },
+  data() {
+    return {
+      selectedWagon: null,
+    };
   },
   components: {
     WagonList,
@@ -49,7 +54,21 @@ export default {
       return this.startWagonsPerOven[this.oven.id].code;
     },
     currentWagon() {
-      return this.currentClassification.currentWagon.code;
+      return this.currentClassification.currentWagon ? this.currentClassification.currentWagon.code : '';
+    }
+  },
+  methods: {
+    ...mapActions(['createClassification']),
+    selectWagon(wagon) {
+      this.selectedWagon = wagon;
+    },
+    startQualityCheck() {
+      if (!this.selectedWagon) {
+        this.$notify({ message: 'Seleccione la vagoneta a clasificar', type: 'danger' });
+        return;
+      }
+      this.createClassification({ oven: this.oven, wagon: this.selectedWagon });
+      this.$router.push('quality-check');
     }
   }
 };

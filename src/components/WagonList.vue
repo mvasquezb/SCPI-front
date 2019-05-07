@@ -1,8 +1,12 @@
 <template>
   <div class="wagon-container">
-    <p v-for="wagon in wagons" class="wagon bg-nude" :key="wagon.id">
-      Vagoneta {{ wagon.code }}
-    </p>
+    <p
+      v-for="wagon in wagons"
+      class="wagon bg-nude"
+      :class="{ 'selected': selectedWagon == wagon }"
+      :key="wagon.id"
+      @click="selectCurrentWagon(wagon)"
+    >Vagoneta {{ wagon.code }}</p>
   </div>
 </template>
 
@@ -12,6 +16,17 @@ export default {
     wagons: {
       type: Array,
       default: () => []
+    }
+  },
+  data() {
+    return {
+      selectedWagon: null,
+    };
+  },
+  methods: {
+    selectCurrentWagon(wagon) {
+      this.selectedWagon = wagon;
+      this.$emit('wagonSelect', wagon);
     }
   }
 };
@@ -23,5 +38,14 @@ export default {
   padding: 20px;
   font-weight: bold;
   font-size: 1.1rem;
+
+  &.selected {
+    border: 3px solid #3498db;
+  }
+
+  &:hover {
+    background-color: #ccc;
+    cursor: pointer;
+  }
 }
 </style>

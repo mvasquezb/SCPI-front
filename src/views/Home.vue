@@ -85,7 +85,9 @@ export default class Home extends Vue {
   classificationData = {};
 
   created() {
-    this.loadFactoryOvens();
+    if (!Object.keys(this.factoryOvens).length) {
+      this.loadFactoryOvens();
+    }
     
     this.pieceClassifications = {
       "estandar": 21,

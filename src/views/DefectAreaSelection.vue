@@ -1,22 +1,21 @@
 <template>
   <div class="row bg-white color-selection">
     <LoadingSpinner v-if="loading"/>
-    <h4 class="col-12 text-center form-title">Seleccionar color de producto a clasificar</h4>
-    <div class="grid-container row">
+    <h4 class="col-12 text-center form-title">Área por defecto de piezas</h4>
+    <div class="grid-container row col-12">
       <div class="col-5 text-center">
-        <h4>Seleccione el color del producto</h4>
+        <h4>Seleccione el área de defecto de pieza</h4>
       </div>
       <div class="col-7">
         <div class="row grid" :class="{ 'error': hasError }">
           <div
-            class="col-3 grid-item"
-            v-for="color in colors"
-            :key="color.id"
-            :class="{ 'selected': selectedColor === color }"
-            @click="() => selectedColor = color"
-            :style="{ 'background-color': color.code }"
+            class="col-3 grid-item d-flex justify-content-center align-items-center bg-nude"
+            v-for="defectArea in defectAreas"
+            :key="defectArea.id"
+            :class="{ 'selected': selectedDefectArea === defectArea }"
+            @click="() => selectedDefectArea = defectArea"
           >
-            <p>{{ color.name }}</p>
+            <p>{{ defectArea.name }}</p>
           </div>
         </div>
       </div>
@@ -24,7 +23,7 @@
     <div class="row w-100 mx-1 my-2">
       <div class="col-12 footer">
         <button class="btn btn-default btn-back" @click="() => $router.back()">Volver</button>
-        <button class="btn btn-default btn-next" @click="onSubmit">Finalizar</button>
+        <button class="btn btn-default btn-next" @click="onSubmit">Aceptar</button>
       </div>
     </div>
   </div>
@@ -40,28 +39,28 @@ export default {
   },
   data() {
     return {
-      selectedColor: null
+      selectedDefectArea: null
     };
   },
   computed: {
-    ...mapState(["colors", "loading", "operationError", "operationSuccessful"]),
+    ...mapState(["defectAreas", "loading", "operationError", "operationSuccessful", "tmpDefect"]),
     hasError() {
-      return this.selectedColor == null;
+      return this.selectedDefectArea == null;
     }
   },
   methods: {
-    ...mapActions(["loadColors", "selectColor"]),
+    ...mapActions(["loadDefectAreas", "selectDefectArea"]),
     onSubmit() {
       if (this.hasError) {
         return;
       }
-      this.selectColor(this.selectedColor);
-      this.$router.push("home");
+      this.selectDefectArea(this.selectedDefectArea);
+      this.$router.push("defect-selection");
     }
   },
   mounted() {
-    if (Object.keys(this.colors).length === 0) {
-      this.loadColors();
+    if (Object.keys(this.defectAreas).length === 0) {
+      this.loadDefectAreas();
     }
   }
 };
@@ -81,6 +80,8 @@ export default {
   justify-content: center;
   overflow-y: auto;
   margin-right: 15px;
+  padding: 15px 0;
+  border: 1px solid black;
 
   &.error {
     border: 1px solid red;
@@ -91,7 +92,7 @@ export default {
 .grid-item {
   border: 1px solid black;
   margin: 5px;
-  padding: 80px 0 0 0;
+  padding: 20px;
   display: flex;
   flex-direction: column-reverse;
 
@@ -110,8 +111,6 @@ export default {
     text-align: center;
     width: 100%;
     text-overflow: ellipsis;
-    border-top: 1px solid black;
-    background-color: white;
   }
 
   .color-container {
