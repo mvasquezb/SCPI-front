@@ -45,7 +45,11 @@ export default {
       return ref.validate();
     },
     onComplete() {
-      this.createShift();
+      if (this.tmpStartWagons && (Object.keys(this.tmpStartWagons).length == this.factoryOvens.length)) {
+        this.createShift();
+      } else {
+        this.$notify({ message: 'Debe completar los datos requeridos', type: 'danger' });
+      }
     },
   }
 }

@@ -16,7 +16,7 @@ export default {
     wagons: {
       type: Array,
       default: () => []
-    }
+    },
   },
   data() {
     return {

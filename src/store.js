@@ -19,7 +19,7 @@ export default new Vuex.Store({
     loading: false,
     operationError: null,
     operationSuccessful: false,
-    currentClassification: null,
+    currentClassification: {},
     productFamilies: {},
     productModels: {},
     classifications: [],
@@ -58,7 +58,7 @@ export default new Vuex.Store({
     addStartWagon: (state, wagon) => {
       state.tmpStartWagons = {
         ...state.tmpStartWagons,
-        [wagon.ovenId]: wagon.wagon
+        [wagon.oven.id]: wagon.oven.wagons.filter(w => w.code == wagon.wagon)[0]
       };
     },
     operationStart: (state) => {
@@ -83,6 +83,11 @@ export default new Vuex.Store({
         state.startWagonsPerOven = { ...state.tmpStartWagons };
         state.tmpStartWagons = null;
         state.creatingShift = false;
+        state.currentClassification = {
+          ...state.currentClassification,
+          currentOven: state.factoryOvens[0],
+          currentWagon: state.startWagonsPerOven[state.factoryOvens[0].id],
+        };
       }
     },
     loadProductFamilies: (state, result) => {
@@ -248,7 +253,7 @@ export default new Vuex.Store({
     },
     loadFactoryOvens({ commit }) {
       commit('operationStart');
-      http.get(`/ovens`)
+      http.get('/ovens')
         .then((res) => commit('factoryOvensLoaded', res.data))
         .catch((e) => commit('operationError', e))
         .finally(() => commit('operationFinish'));

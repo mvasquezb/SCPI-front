@@ -21,7 +21,7 @@
       </div>
       <div class="row bottom-container">
         <div class="col-12">
-          <div class="row bg-nude">
+          <div class="row bg-nude overflow-hidden">
             <Oven v-for="oven in visibleOvens" class="col-md-6 oven" :oven="oven" :key="oven.id"/>
           </div>
           <div class="row bg-nude shift-info-actions">
@@ -68,17 +68,12 @@ import CreateShiftForm from '@/components/CreateShiftForm.vue';
     CreateShiftForm,
   },
   computed: {
-    ...mapState(['factoryOvens', 'creatingShift', 'currentClassification']),
+    ...mapState(['factoryOvens', 'creatingShift', 'currentClassification', 'startWagonsPerOven']),
     shift: mapState(['currentShift']).currentShift,
   },
   methods: {
     ...mapActions(['loadFactoryOvens', 'setCurrentWagon']),
   },
-  watch: {
-    hasOpenShift() {
-      this.setCurrentWagon(this.currentClassification.currentOven.wagons[0]);
-    }
-  }
 })
 export default class Home extends Vue {
   pieceClassifications = {};
@@ -129,16 +124,12 @@ export default class Home extends Vue {
     };
   }
 
-  mounted() {
-    this.setCurrentWagon(this.ovenData.currentOven.wagons[0]);
-  }
-
   createShiftStart() {
     this.$store.state.creatingShift = true;
   }
 
   get visibleOvens() {
-    return this.factoryOvens.slice(0, 1);
+    return this.factoryOvens;
   }
   
   get currentClassData() {
@@ -154,14 +145,18 @@ export default class Home extends Vue {
     return this.shift != null;
   }
 
+  get currentWagon() {
+    return this.currentClassification.currentWagon;
+  }
+
   get ovenData() {
     return {
       productModel: this.currentClassification.productModel,
       color: this.currentClassification.color,
-      currentOven: this.factoryOvens[0],
-      coatOperator: this.currentClassification.coatOperator || {},
-      castOperator: this.currentClassification.castOperator || {},
-      polishOperator: this.currentClassification.polishOperator || {},
+      currentOven: this.currentClassification.currentOven,
+      coatOperator: this.currentWagon.coatOperator || {},
+      castOperator: this.currentWagon.castOperator || {},
+      polishOperator: this.currentWagon.polishOperator || {},
     };
   }
 

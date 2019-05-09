@@ -2,7 +2,7 @@
   <nav class="navbar navbar-expand-lg navbar-light">
     <div class="container-fluid">
       <div class="col-4">
-        <p class="p-0 m-0 page-title" href="#">Hola, {{currentUser.name}}</p>
+        <p v-if="currentUser" class="p-0 m-0 page-title" href="#">Hola, {{currentUser.name}}</p>
       </div>
       <button
         class="navbar-toggler navbar-burger"
