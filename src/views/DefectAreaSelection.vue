@@ -1,5 +1,5 @@
 <template>
-  <div class="row bg-white color-selection">
+  <div class="row bg-white defectArea-selection">
     <LoadingSpinner v-if="loading"/>
     <h4 class="col-12 text-center form-title">Área por defecto de piezas</h4>
     <div class="grid-container row col-12">

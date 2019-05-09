@@ -1,21 +1,21 @@
 <template>
-  <div class="row bg-white quality-selection">
+  <div class="row bg-white evaluation-selection">
     <LoadingSpinner v-if="loading"/>
-    <h4 class="col-12 text-center form-title">Nivel de Calidad</h4>
+    <h4 class="col-12 text-center form-title">Tipo de Resane</h4>
     <div class="grid-container row col-12">
       <div class="col-5 text-center">
-        <h4>Seleccione el nivel de calidad del producto</h4>
+        <h4>Seleccione el tipo de resane</h4>
       </div>
       <div class="col-7">
         <div class="row grid" :class="{ 'error': hasError }">
           <div
             class="col-3 grid-item d-flex justify-content-center align-items-center bg-nude"
-            v-for="quality in qualityLevels"
-            :key="quality.id"
-            :class="{ 'selected': selectedQuality === quality }"
-            @click="() => selectedQuality = quality"
+            v-for="evaluation in evaluationTypes"
+            :key="evaluation.id"
+            :class="{ 'selected': selectedEvaluation === evaluation }"
+            @click="() => selectedEvaluation = evaluation"
           >
-            <p>{{ quality.name }}</p>
+            <p>{{ evaluation.name }}</p>
           </div>
         </div>
       </div>
@@ -39,51 +39,36 @@ export default {
   },
   data() {
     return {
-      selectedQuality: null
+      selectedEvaluation: null
     };
   },
   computed: {
     ...mapState([
-      "qualityLevels",
+      "evaluationTypes",
       "loading",
       "operationError",
       "operationSuccessful"
     ]),
     hasError() {
-      return this.selectedQuality == null;
+      return this.selectedEvaluation == null;
     }
   },
   methods: {
-    ...mapActions(["loadQualityLevels", "selectQuality"]),
+    ...mapActions(["loadEvaluationTypes", "selectEvaluationType"]),
     onSubmit() {
       if (this.hasError) {
         return;
       }
-      this.selectQuality(this.selectedQuality);
+      this.selectEvaluationType(this.selectedEvaluation);
       this.nextPage();
     },
     nextPage() {
-      if (this.selectedQuality.code == 'S') {
-        // Resane
-        this.$router.push('repair-selection');
-        return;
-      }
-      if (this.selectedQuality.code == 'V') {
-        // Evaluación
-        this.$router.push('evaluation-selection');
-        return;
-      }
-      if (this.selectedQuality.code == 'R') {
-        // Rotura
-        this.$router.push('castDate-selection');
-        return;
-      }
       this.$router.push('quality-check');
     }
   },
   mounted() {
-    if (Object.keys(this.qualityLevels).length === 0) {
-      this.loadQualityLevels();
+    if (Object.keys(this.evaluationTypes).length === 0) {
+      this.loadEvaluationTypes();
     }
   }
 };

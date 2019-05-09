@@ -14,14 +14,39 @@
           <p class="value">{{ item.value }}</p>
         </div>
       </div>
+      <div class="summary-item d-flex justify-content-between col-12 my-2">
+        <div class="d-flex flex-column justify-items-center">
+          <div class="d-flex">
+            <p class="label">Nivel de Calidad determinado por el Operario:</p>
+            <p
+              class="value"
+            >{{ assignedQualityText }}</p>
+          </div>
+          <div class="d-flex">
+            <p class="label mb-0">Nivel de Calidad determinado por el Sistema:</p>
+            <p
+              class="value mb-0"
+            >{{ systemQualityText }}</p>
+          </div>
+        </div>
+        <button
+            class="btn btn-default btn-add-defect m-0"
+            @click="goToQualitySelect"
+          >Seleccionar Nivel de Calidad</button>
+      </div>
       <div class="summary-item d-flex flex-column col-12">
-        <p class="label">Defectos</p>
+        <div class="defect-list-header d-flex justify-content-between align-items-center pb-2">
+          <p class="label m-0">Defectos</p>
+          <button
+            class="btn btn-default btn-add-defect align-self-center m-0"
+            @click="goToAddDefect"
+          >Registrar Defecto</button>
+        </div>
         <ul class="defect-list">
           <li v-for="(defect, index) in defects" :key="index" class="defect-item">
             <p class="defect-description">{{ defect.text }}</p>
           </li>
         </ul>
-        <button class="btn btn-default btn-add-defect col-3 align-self-center" @click="goToAddDefect">Registrar Defecto</button>
       </div>
     </div>
     <div class="row w-100 mx-1 my-2">
@@ -84,6 +109,38 @@ export default {
           }`
         };
       });
+    },
+    assignedQualityLevel() {
+      return this.currentClassification.assignedQualityLevel;
+    },
+    systemQualityLevel() {
+      return this.currentClassification.systemQualityLevel;
+    },
+    assignedQualityText() {
+      if (!this.assignedQualityLevel) {
+        return 'No definido';
+      }
+      let text = this.assignedQualityLevel.name;
+      if (this.assignedQualityLevel.code == 'S') {
+        return `${text} - ${this.currentClassification.repair.repairType.name}`;
+      }
+      if (this.assignedQualityLevel.code == 'V') {
+        return `${text} - ${this.currentClassification.evaluation.evaluationType.name}`;
+      }
+      return text;
+    },
+    systemQualityText() {
+      if (!this.systemQualityLevel) {
+        return 'Se requiere más información';
+      }
+      let text = this.systemQualityLevel.name;
+      if (this.systemQualityLevel.code == 'S') {
+        return `${text} - ${this.currentClassification.repair.repairType.name}`;
+      }
+      if (this.systemQualityLevel.code == 'V') {
+        return `${text} - ${this.currentClassification.evaluation.evaluationType.name}`;
+      }
+      return text;
     }
   },
   methods: {
@@ -95,7 +152,10 @@ export default {
     goToAddDefect() {
       this.tmpDefect = {};
       this.$router.push("defect-area-selection");
-    }
+    },
+    goToQualitySelect() {
+      this.$router.push('quality-selection');
+    },
   }
 };
 </script>

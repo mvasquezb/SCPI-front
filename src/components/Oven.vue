@@ -15,14 +15,8 @@
         <DataIndicator title="Vagoneta Actual" :value="currentWagon" />
       </div>
     </div>
-    <div class="row d-flex oven-actions">
-      <div class="col-5 text-center">
-        <button class="btn btn-main" @click="startQualityCheck">Aceptar</button>
-      </div>
-      <div class="col-2"></div>
-      <div class="col-5 text-center">
-        <button class="btn btn-main">Libre</button>
-      </div>
+    <div class="row d-flex justify-content-center oven-actions">
+      <button class="btn btn-main" @click="startQualityCheck">Empezar Clasificación</button>
     </div>
   </div>
 </template>
@@ -63,12 +57,26 @@ export default {
       this.selectedWagon = wagon;
     },
     startQualityCheck() {
-      if (!this.selectedWagon) {
-        this.$notify({ message: 'Seleccione la vagoneta a clasificar', type: 'danger' });
+      if (!this.validateRequiredQualityCheck()) {
         return;
       }
       this.createClassification({ oven: this.oven, wagon: this.selectedWagon });
       this.$router.push('quality-check');
+    },
+    validateRequiredQualityCheck() {
+      if (!this.currentClassification.productModel) {
+        this.$notify({ message: 'Seleccione el modelo de producto', type: 'danger' });
+        return false;
+      }
+      if (!this.currentClassification.color) {
+        this.$notify({ message: 'Seleccione el color de producto', type: 'danger' });
+        return false;
+      }
+      if (!this.selectedWagon) {
+        this.$notify({ message: 'Seleccione la vagoneta a clasificar', type: 'danger' });
+        return false;
+      }
+      return true;
     }
   }
 };

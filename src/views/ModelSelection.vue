@@ -129,7 +129,7 @@ export default {
         return false;
       }
 
-      if (!this.familyModels) {
+      if (!this.familyModels.length) {
         this.loadModelsForFamily(this.selectedFamily);
       }
       return true;

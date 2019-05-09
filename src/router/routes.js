@@ -13,6 +13,9 @@ import QualityCheck from '@/views/QualityCheck.vue';
 import DefectAreaSelection from '@/views/DefectAreaSelection.vue';
 import DefectSelection from '@/views/DefectSelection.vue';
 import PieceZoneSelection from '@/views/PieceZoneSelection.vue';
+import QualitySelection from '@/views/QualitySelection.vue';
+import RepairSelection from '@/views/RepairSelection.vue';
+import EvaluationSelection from '@/views/EvaluationSelection.vue';
 
 Vue.use(Router)
 
@@ -79,6 +82,21 @@ const routes = [
         path: 'pieceZone-selection',
         name: 'pieceZone-selection',
         component: PieceZoneSelection,
+      },
+      {
+        path: 'quality-selection',
+        name: 'quality-selection',
+        component: QualitySelection,
+      },
+      {
+        path: 'repair-selection',
+        name: 'repair-selection',
+        component: RepairSelection,
+      },
+      {
+        path: 'evaluation-selection',
+        name: 'evaluation-selection',
+        component: EvaluationSelection,
       },
     ]
   },

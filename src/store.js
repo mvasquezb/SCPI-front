@@ -28,7 +28,10 @@ export default new Vuex.Store({
     defectAreas: [],
     defectsPerArea: {},
     tmpDefect: null,
-    pieceZones: {}
+    pieceZones: {},
+    qualityLevels: [],
+    repairTypes: [],
+    evaluationTypes: [],
   },
   mutations: {
     initialiseStore(state) {
@@ -179,6 +182,9 @@ export default new Vuex.Store({
         ...state.currentClassification,
         currentWagon: wagon,
         currentOven: oven,
+        polishOperator: wagon.polishOperator,
+        coatOperator: wagon.coatOperator,
+        castOperator: wagon.castOperator,
         pieceClassification: {},
       };
     },
@@ -231,6 +237,34 @@ export default new Vuex.Store({
         defects: defects,
       };
       state.tmpDefect = null;
+    },
+    qualitySelected: (state, quality) => {
+      state.currentClassification = {
+        ...state.currentClassification,
+        assignedQualityLevel: quality,
+      };
+    },
+    repairSelected: (state, repair) => {
+      state.currentClassification = {
+        ...state.currentClassification,
+        repair: {
+          repairType: repair,
+        }
+      };
+    },
+    evaluationSelected: (state, evaluation) => {
+      state.currentClassification = {
+        ...state.currentClassification,
+        evaluation: {
+          evaluationType: evaluation,
+        }
+      };
+    },
+    repairTypesLoaded: (state, repairTypes) => {
+      state.repairTypes = repairTypes;
+    },
+    evaluationTypesLoaded: (state, evaluationTypes) => {
+      state.evaluationTypes = evaluationTypes;
     },
   },
   actions: {
@@ -358,6 +392,31 @@ export default new Vuex.Store({
     },
     saveDefect({ commit }, defect) {
       commit('defectSaved', defect);
-    }
+    },
+    selectQuality({ commit }, quality) {
+      commit('qualitySelected', quality);
+    },
+    selectRepairType({ commit }, repair) {
+      commit('repairSelected', repair);
+    },
+    selectEvaluationType({ commit }, evaluation) {
+      commit('evaluationSelected', evaluation);
+    },
+    loadRepairTypes({ commit }) {
+      commit('operationStart');
+
+      http.get(`/repair-types`)
+        .then((r) => commit('repairTypesLoaded', r.data))
+        .catch((e) => commit('operationError', e))
+        .finally(() => commit('operationFinish'));
+    },
+    loadEvaluationTypes({ commit }) {
+      commit('operationStart');
+
+      http.get(`/evaluation-types`)
+        .then((r) => commit('evaluationTypesLoaded', r.data))
+        .catch((e) => commit('operationError', e))
+        .finally(() => commit('operationFinish'));
+    },
   }
 });
