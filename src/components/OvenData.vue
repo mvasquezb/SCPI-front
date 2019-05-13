@@ -1,11 +1,14 @@
 <template>
   <div class="bg-white oven-data">
-    <div class="bg-nude oven-item btn-action" @click="() => $router.push('model-selection')">
+    <div class="oven-item col-2">
+      <p>Última clasificación</p>
+    </div>
+    <div class="bg-nude oven-item">
       <p>Modelo</p>
       <p v-if="data.productModel">{{ data.productModel.code }}</p>
       <button v-else class="btn btn-default">Seleccionar</button>
     </div>
-    <div class="bg-nude oven-item btn-action" @click="() => $router.push('color-selection')">
+    <div class="bg-nude oven-item">
       <p>Color</p>
       <p v-if="data.color">{{ data.color.name }}</p>
       <button v-else class="btn btn-default">Seleccionar</button>
@@ -14,11 +17,9 @@
       v-for="(item, index) in visibleInfoItems"
       :key="index"
       class="bg-nude oven-item"
-      :class="{ 'btn-action': item.action }"
       :title="item.title"
       :value="item.value ? item.value.code : String.fromCharCode(160)"
       size="small"
-      @click.native="runItemAction(item)"
     />
   </div>
 </template>
@@ -62,11 +63,11 @@ export default {
     }
   },
   methods: {
-    runItemAction(item) {
-      if (item.action) {
-        this.$router.push(item.action);
-      }
-    }
+    // runItemAction(item) {
+    //   if (item.action) {
+    //     this.$router.push(item.action);
+    //   }
+    // }
   }
 };
 </script>
@@ -89,10 +90,5 @@ export default {
     margin: 0;
     font-weight: bold;
   }
-}
-
-.btn-action:hover {
-  cursor: pointer;
-  background-color: #ccc;
 }
 </style>

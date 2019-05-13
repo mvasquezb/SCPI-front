@@ -22,8 +22,8 @@
     </div>
     <div class="row w-100 mx-1 my-2">
       <div class="col-12 footer">
-        <button class="btn btn-default btn-back" @click="() => $router.back()">Volver</button>
-        <button class="btn btn-default btn-next" @click="onSubmit">Aceptar</button>
+        <button class="btn btn-default btn-back" @click="$router.back">Volver</button>
+        <button class="btn btn-default btn-next" @click="onFinish">Finalizar registro</button>
       </div>
     </div>
   </div>
@@ -44,23 +44,27 @@ export default {
   },
   computed: {
     ...mapState(["defectAreas", "loading", "operationError", "operationSuccessful", "tmpDefect"]),
-    hasError() {
-      return this.selectedDefectArea == null;
-    }
   },
   methods: {
     ...mapActions(["loadDefectAreas", "selectDefectArea"]),
     onSubmit() {
-      if (this.hasError) {
-        return;
-      }
       this.selectDefectArea(this.selectedDefectArea);
       this.$router.push("defect-selection");
+    },
+    onFinish() {
+      this.$router.push('quality-check');
     }
   },
   mounted() {
     if (Object.keys(this.defectAreas).length === 0) {
       this.loadDefectAreas();
+    }
+  },
+  watch: {
+    selectedDefectArea() {
+      if (this.selectedDefectArea) {
+        this.onSubmit();
+      }
     }
   }
 };

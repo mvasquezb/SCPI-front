@@ -23,7 +23,6 @@
     <div class="row w-100 mx-1 my-2">
       <div class="col-12 footer">
         <button class="btn btn-default btn-back" @click="() => $router.back()">Volver</button>
-        <button class="btn btn-default btn-next" @click="onSubmit">Aceptar</button>
       </div>
     </div>
   </div>
@@ -44,24 +43,26 @@ export default {
   },
   computed: {
     ...mapState(["pieceZones", "loading", "operationError", "operationSuccessful", "tmpDefect"]),
-    hasError() {
-      return this.selectedZone == null;
-    },
   },
   methods: {
     ...mapActions(["loadPieceZones", "selectPieceZone", "saveDefect"]),
     onSubmit() {
-      if (this.hasError) {
-        return;
-      }
       this.selectPieceZone(this.selectedZone);
       this.saveDefect(this.tmpDefect);
-      this.$router.push("quality-check");
+      this.$notify({ message: "Defecto registrado", type: "info"});
+      this.$router.push("defect-area-selection");
     }
   },
   mounted() {
     if (Object.keys(this.pieceZones).length === 0) {
       this.loadPieceZones();
+    }
+  },
+  watch: {
+    selectedZone() {
+      if (this.selectedZone) {
+        this.onSubmit();
+      }
     }
   }
 };

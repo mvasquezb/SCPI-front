@@ -56,7 +56,7 @@ export default {
         return;
       }
       this.selectColor(this.selectedColor);
-      this.$router.push("home");
+      this.$router.push("quality-check");
     }
   },
   mounted() {

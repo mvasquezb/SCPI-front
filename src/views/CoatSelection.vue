@@ -71,7 +71,7 @@ export default {
     onSubmit() {
       if (this.validate()) {
         this.selectCoatOperator(this.prefix + this.operatorCode);
-        this.$router.push("home");
+        this.$router.push("quality-check");
       }
     },
     clear() {

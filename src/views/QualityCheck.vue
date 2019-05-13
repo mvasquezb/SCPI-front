@@ -3,36 +3,32 @@
     <h4>Evaluación de Calidad</h4>
     <div class="row classification-summary bg-nude">
       <div class="col-6 d-flex flex-column">
-        <div v-for="(item, index) in summaryData" :key="index" class="summary-item d-flex">
-          <p class="label">{{ item.label }}:</p>
-          <p class="value">{{ item.value }}</p>
+        <div
+          v-for="(item, index) in summaryData"
+          :key="index"
+          class="summary-item d-flex justify-content-between"
+        >
+          <div class="d-flex flex-shrink align-items-center">
+            <p class="label">{{ item.label }}:</p>
+            <p class="value">{{ item.value }}</p>
+          </div>
+          <router-link class="btn btn-default" :to="item.route">Editar</router-link>
+          <!-- <button class="btn btn-default" v-if="item.action" @click="item.action">Editar</button> -->
         </div>
       </div>
       <div class="col-6 d-flex flex-column">
-        <div v-for="(item, index) in wagonOperators" :key="index" class="summary-item d-flex">
-          <p class="label">{{ item.label }}:</p>
-          <p class="value">{{ item.value }}</p>
-        </div>
-      </div>
-      <div class="summary-item d-flex justify-content-between col-12 my-2">
-        <div class="d-flex flex-column justify-items-center">
-          <div class="d-flex">
-            <p class="label">Nivel de Calidad determinado por el Operario:</p>
-            <p
-              class="value"
-            >{{ assignedQualityText }}</p>
+        <div
+          v-for="(item, index) in wagonOperators"
+          :key="index"
+          class="summary-item d-flex justify-content-between"
+        >
+          <div class="d-flex flex-shrink align-items-center">
+            <p class="label">{{ item.label }}:</p>
+            <p class="value">{{ item.value }}</p>
           </div>
-          <div class="d-flex">
-            <p class="label mb-0">Nivel de Calidad determinado por el Sistema:</p>
-            <p
-              class="value mb-0"
-            >{{ systemQualityText }}</p>
-          </div>
+          <router-link class="btn btn-default" :to="item.route">Editar</router-link>
+          <!-- <button class="btn btn-default" v-if="item.action" @click="item.action">Editar</button> -->
         </div>
-        <button
-            class="btn btn-default btn-add-defect m-0"
-            @click="goToQualitySelect"
-          >Seleccionar Nivel de Calidad</button>
       </div>
       <div class="summary-item d-flex flex-column col-12">
         <div class="defect-list-header d-flex justify-content-between align-items-center pb-2">
@@ -51,10 +47,23 @@
     </div>
     <div class="row w-100 mx-1 my-2">
       <div class="col-12 footer">
-        <button class="btn btn-default btn-back" @click="() => $router.back()">Volver</button>
+        <button class="btn btn-default btn-back" @click="$router.push('home')">Volver</button>
         <button class="btn btn-default btn-next" @click="onSubmit">Finalizar</button>
       </div>
     </div>
+    <b-modal id="confirm-modal" size="lg" title="Confirmar Clasificación" @ok="onFinish">
+      <template slot="default">
+        <p>{{ systemQualityText }}</p>
+        <p>¿ Confirma el nivel de calidad determinado ?</p>
+      </template>
+
+      <template slot="modal-footer" slot-scope="{ ok, hide }">
+        <b-button variant="danger" @click="hide()">Cancelar</b-button>
+        <b-button variant="info" @click="$router.push('quality-selection')">Seleccionar otro</b-button>
+        <b-button variant="success" @click="ok()">Confirmar</b-button>
+        <!-- Button with custom close trigger value -->
+      </template>
+    </b-modal>
   </div>
 </template>
 
@@ -76,11 +85,13 @@ export default {
         },
         {
           label: "Modelo",
-          value: this.currentClassification.productModel.name
+          value: this.currentClassification.productModel.name,
+          route: "model-selection"
         },
         {
           label: "Color",
-          value: this.currentClassification.color.name
+          value: this.currentClassification.color.name,
+          route: "color-selection"
         }
       ];
     },
@@ -88,15 +99,18 @@ export default {
       return [
         {
           label: "Pulidor",
-          value: this.currentClassification.polishOperator.code
+          value: this.currentClassification.polishOperator.code,
+          route: "polish-selection"
         },
         {
           label: "Barnizador",
-          value: this.currentClassification.coatOperator.code
+          value: this.currentClassification.coatOperator.code,
+          route: "coat-selection"
         },
         {
           label: "Colador",
-          value: this.currentClassification.castOperator.code
+          value: this.currentClassification.castOperator.code,
+          route: "cast-selection"
         }
       ];
     },
@@ -118,27 +132,31 @@ export default {
     },
     assignedQualityText() {
       if (!this.assignedQualityLevel) {
-        return 'No definido';
+        return "No definido";
       }
       let text = this.assignedQualityLevel.name;
-      if (this.assignedQualityLevel.code == 'S') {
+      if (this.assignedQualityLevel.code == "S") {
         return `${text} - ${this.currentClassification.repair.repairType.name}`;
       }
-      if (this.assignedQualityLevel.code == 'V') {
-        return `${text} - ${this.currentClassification.evaluation.evaluationType.name}`;
+      if (this.assignedQualityLevel.code == "V") {
+        return `${text} - ${
+          this.currentClassification.evaluation.evaluationType.name
+        }`;
       }
       return text;
     },
     systemQualityText() {
       if (!this.systemQualityLevel) {
-        return 'Se requiere más información';
+        return "Se requiere más información";
       }
       let text = this.systemQualityLevel.name;
-      if (this.systemQualityLevel.code == 'S') {
+      if (this.systemQualityLevel.code == "S") {
         return `${text} - ${this.currentClassification.repair.repairType.name}`;
       }
-      if (this.systemQualityLevel.code == 'V') {
-        return `${text} - ${this.currentClassification.evaluation.evaluationType.name}`;
+      if (this.systemQualityLevel.code == "V") {
+        return `${text} - ${
+          this.currentClassification.evaluation.evaluationType.name
+        }`;
       }
       return text;
     }
@@ -146,6 +164,9 @@ export default {
   methods: {
     ...mapActions(["saveClassification"]),
     onSubmit() {
+      this.$bvModal.show("confirm-modal");
+    },
+    onFinish() {
       this.saveClassification(this.currentClassification);
       this.$router.push("home");
     },
@@ -154,8 +175,8 @@ export default {
       this.$router.push("defect-area-selection");
     },
     goToQualitySelect() {
-      this.$router.push('quality-selection');
-    },
+      this.$router.push("quality-selection");
+    }
   }
 };
 </script>
@@ -163,9 +184,6 @@ export default {
 <style lang="scss">
 .q-check {
   .btn {
-    margin-top: 10px;
-    padding-top: 15px;
-    padding-bottom: 15px;
     box-sizing: border-box;
     border-width: 2px;
     font-size: 14px;
@@ -190,11 +208,23 @@ export default {
 }
 
 .summary-item {
+  margin-top: 5px;
+  margin-bottom: 5px;
+
+  p {
+    margin: 0;
+  }
+
   p.label {
     margin-right: 5px;
     font-weight: bold;
   }
+
+  a {
+    margin: 0;
+  }
 }
+
 .footer {
   width: 100%;
   display: flex;

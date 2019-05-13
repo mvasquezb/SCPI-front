@@ -23,7 +23,6 @@
     <div class="row w-100 mx-1 my-2">
       <div class="col-12 footer">
         <button class="btn btn-default btn-back" @click="() => $router.back()">Volver</button>
-        <button class="btn btn-default btn-next" @click="onSubmit">Aceptar</button>
       </div>
     </div>
   </div>
@@ -44,9 +43,6 @@ export default {
   },
   computed: {
     ...mapState(["defectsPerArea", "loading", "operationError", "operationSuccessful", "tmpDefect"]),
-    hasError() {
-      return this.selectedDefect == null;
-    },
     defectArea() {
       return this.tmpDefect.defectArea;
     },
@@ -57,9 +53,6 @@ export default {
   methods: {
     ...mapActions(["loadDefectsForArea", "selectDefect"]),
     onSubmit() {
-      if (this.hasError) {
-        return;
-      }
       this.selectDefect(this.selectedDefect);
       this.$router.push("pieceZone-selection");
     }
@@ -67,6 +60,13 @@ export default {
   mounted() {
     if (!this.defects || Object.keys(this.defects).length === 0) {
       this.loadDefectsForArea(this.defectArea);
+    }
+  },
+  watch: {
+    selectedDefect() {
+      if (this.selectedDefect) {
+        this.onSubmit();
+      }
     }
   }
 };

@@ -139,7 +139,7 @@ export default {
         return false;
       }
       this.selectModel(this.selectedModel);
-      this.$router.push("home");
+      this.$router.push("quality-check");
       return true;
     },
     prevButtonText(index) {

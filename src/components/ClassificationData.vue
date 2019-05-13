@@ -1,17 +1,18 @@
 <template>
   <div class="bg-white classification-data">
-    <button class="btn btn-main classification-item">Pnd</button>
-    <div class="bg-nude classification-item">
-      <p>CALIDAD</p>
+    <div class="classification-item col-2">
+      <p>Calidad</p>
     </div>
-    <DataIndicator
-      v-for="(item, index) in visibleInfoItems"
-      :key="index"
-      class="bg-nude classification-item"
-      :title="item.title"
-      :value="item.value.repr"
-      size="small"
-    />
+    <div class="data-container col-10 d-flex justify-content-between">
+      <DataIndicator
+        v-for="(item, index) in visibleInfoItems"
+        :key="index"
+        class="bg-nude classification-item"
+        :title="item.title"
+        :value="item.value.repr"
+        size="small"
+      />
+    </div>
   </div>
 </template>
 
@@ -34,7 +35,7 @@ export default {
       defect: this.classification.defect,
       location: this.classification.defect.location,
       wagon: this.classification.wagon,
-      date: Date.now(),
+      date: Date.now()
     };
   },
   computed: {
@@ -54,7 +55,7 @@ export default {
         },
         {
           title: "Vagoneta",
-          value: { ...this.wagon, repr: this.wagon.code } 
+          value: { ...this.wagon, repr: this.wagon.code }
         }
       ];
     }
@@ -65,7 +66,7 @@ export default {
 <style lang="scss" scoped>
 .classification-data {
   display: flex;
-  justify-content: space-evenly;
+  justify-content: space-between;
   width: 100%;
 }
 .classification-item {
