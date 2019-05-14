@@ -10,7 +10,7 @@
         <div class="row grid" :class="{ 'error': hasError }">
           <div
             class="col-3 grid-item d-flex justify-content-center align-items-center bg-nude"
-            v-for="pieceZone in pieceZones"
+            v-for="pieceZone in productZones"
             :key="pieceZone.id"
             :class="{ 'selected': selectedZone === pieceZone }"
             @click="() => selectedZone = pieceZone"
@@ -38,15 +38,27 @@ export default {
   },
   data() {
     return {
-      selectedZone: null
+      selectedZone: null,
     };
   },
   computed: {
-    ...mapState(["pieceZones", "loading", "operationError", "operationSuccessful", "tmpDefect"]),
+    ...mapState(["currentClassification", "pieceZones", "loading", "operationError", "operationSuccessful", "tmpDefect"]),
+    hasError() {
+      return this.selectedZone == null;
+    },
+    productZones() {
+      return this.pieceZones[this.zoneKey];
+    },
+    zoneKey() {
+      return `${this.currentClassification.productFamily.id}:${this.currentClassification.productModel.id}`;
+    },
   },
   methods: {
     ...mapActions(["loadPieceZones", "selectPieceZone", "saveDefect"]),
     onSubmit() {
+      if (this.hasError) {
+        return;
+      }
       this.selectPieceZone(this.selectedZone);
       this.saveDefect(this.tmpDefect);
       this.$notify({ message: "Defecto registrado", type: "info"});
@@ -54,8 +66,12 @@ export default {
     }
   },
   mounted() {
-    if (Object.keys(this.pieceZones).length === 0) {
-      this.loadPieceZones();
+    if (!this.pieceZones[this.zoneKey]) {
+      this.loadPieceZones({ 
+        key: this.zoneKey,
+        family: this.zoneKey.split(':')[0],
+        model: this.zoneKey.split(':')[1],
+       });
     }
   },
   watch: {

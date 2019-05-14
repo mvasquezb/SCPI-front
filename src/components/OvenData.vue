@@ -6,12 +6,10 @@
     <div class="bg-nude oven-item">
       <p>Modelo</p>
       <p v-if="data.productModel">{{ data.productModel.code }}</p>
-      <button v-else class="btn btn-default">Seleccionar</button>
     </div>
     <div class="bg-nude oven-item">
       <p>Color</p>
       <p v-if="data.color">{{ data.color.name }}</p>
-      <button v-else class="btn btn-default">Seleccionar</button>
     </div>
     <DataIndicator
       v-for="(item, index) in visibleInfoItems"
@@ -47,17 +45,14 @@ export default {
         {
           title: "Colador",
           value: this.data.castOperator,
-          action: 'cast-selection',
         },
         {
           title: "Barnizador",
           value: this.data.coatOperator,
-          action: 'coat-selection',
         },
         {
           title: "Pulidor",
           value: this.data.polishOperator,
-          action: 'polish-selection',
         }
       ];
     }

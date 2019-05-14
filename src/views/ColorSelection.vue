@@ -24,7 +24,7 @@
     <div class="row w-100 mx-1 my-2">
       <div class="col-12 footer">
         <button class="btn btn-default btn-back" @click="() => $router.back()">Volver</button>
-        <button class="btn btn-default btn-next" @click="onSubmit">Finalizar</button>
+        <!-- <button class="btn btn-default btn-next" @click="onSubmit">Finalizar</button> -->
       </div>
     </div>
   </div>
@@ -62,6 +62,13 @@ export default {
   mounted() {
     if (Object.keys(this.colors).length === 0) {
       this.loadColors();
+    }
+  },
+  watch: {
+    selectedColor() {
+      if (this.selectedColor) {
+        this.onSubmit();
+      }
     }
   }
 };

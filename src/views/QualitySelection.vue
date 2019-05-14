@@ -23,7 +23,7 @@
     <div class="row w-100 mx-1 my-2">
       <div class="col-12 footer">
         <button class="btn btn-default btn-back" @click="() => $router.back()">Volver</button>
-        <button class="btn btn-default btn-next" @click="onSubmit">Aceptar</button>
+        <!-- <button class="btn btn-default btn-next" @click="onSubmit">Aceptar</button> -->
       </div>
     </div>
   </div>
@@ -49,41 +49,46 @@ export default {
       "operationError",
       "operationSuccessful"
     ]),
-    hasError() {
-      return this.selectedQuality == null;
-    }
   },
   methods: {
     ...mapActions(["loadQualityLevels", "selectQuality"]),
     onSubmit() {
-      if (this.hasError) {
-        return;
-      }
       this.selectQuality(this.selectedQuality);
       this.nextPage();
     },
     nextPage() {
-      if (this.selectedQuality.code == 'S') {
-        // Resane
-        this.$router.push('repair-selection');
-        return;
+      switch (this.selectedQuality.code) {
+        case 'S': {
+          // Resane
+          this.$router.push('repair-selection');
+          break;
+        }
+        case 'V': {
+          // Evaluación
+          this.$router.push('evaluation-selection');
+          break;
+        }
+        case 'R': {
+          // Rotura
+          this.$router.push('castDate-selection');
+          break;
+        }
+        default: {
+          this.$router.push('home');
+        }
       }
-      if (this.selectedQuality.code == 'V') {
-        // Evaluación
-        this.$router.push('evaluation-selection');
-        return;
-      }
-      if (this.selectedQuality.code == 'R') {
-        // Rotura
-        this.$router.push('castDate-selection');
-        return;
-      }
-      this.$router.push('quality-check');
     }
   },
   mounted() {
     if (Object.keys(this.qualityLevels).length === 0) {
       this.loadQualityLevels();
+    }
+  },
+  watch: {
+    selectedQuality() {
+      if (this.selectedQuality) {
+        this.onSubmit();
+      }
     }
   }
 };

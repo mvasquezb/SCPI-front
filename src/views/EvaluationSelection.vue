@@ -1,10 +1,10 @@
 <template>
   <div class="row bg-white evaluation-selection">
     <LoadingSpinner v-if="loading"/>
-    <h4 class="col-12 text-center form-title">Tipo de Resane</h4>
+    <h4 class="col-12 text-center form-title">Tipo de Evaluación</h4>
     <div class="grid-container row col-12">
       <div class="col-5 text-center">
-        <h4>Seleccione el tipo de resane</h4>
+        <h4>Seleccione el tipo de evaluación</h4>
       </div>
       <div class="col-7">
         <div class="row grid" :class="{ 'error': hasError }">

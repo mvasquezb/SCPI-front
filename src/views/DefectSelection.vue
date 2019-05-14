@@ -48,6 +48,9 @@ export default {
     },
     defects() {
       return this.defectsPerArea[this.defectArea.id];
+    },
+    hasError() {
+      return this.selectedDefect == null;
     }
   },
   methods: {

@@ -120,6 +120,7 @@ export default new Vuex.Store({
       state.currentClassification = {
         ...state.currentClassification,
         productModel: model,
+        productFamily: model.productFamily,
       };
     },
     colorsLoaded: (state, res) => {
@@ -220,8 +221,12 @@ export default new Vuex.Store({
         defectType: defect,
       };
     },
-    pieceZonesLoaded: (state, pieceZones) => {
-      state.pieceZones = pieceZones;
+    pieceZonesLoaded: (state, { key, data }) => {
+      console.log(key, data, data.map((pz) => pz.pieceZone));
+      state.pieceZones = {
+        ...state.pieceZones,
+        [key]: data.map((pz) => pz.pieceZone),
+      };
     },
     pieceZoneSelected: (state, zone) => {
       state.tmpDefect = {
@@ -379,11 +384,11 @@ export default new Vuex.Store({
     selectDefect({ commit }, defect) {
       commit('defectSelected', defect);
     },
-    loadPieceZones({ commit }) {
+    loadPieceZones({ commit }, { key, family, model }) {
       commit('operationStart');
 
-      http.get(`/piece-zones`)
-        .then((r) => commit('pieceZonesLoaded', r.data))
+      http.get(`/piece-zones/${family}/${model}`)
+        .then((r) => commit('pieceZonesLoaded', { key, data: r.data }))
         .catch((e) => commit('operationError', e))
         .finally(() => commit('operationFinish'));
     },

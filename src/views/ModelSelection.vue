@@ -3,7 +3,7 @@
     <LoadingSpinner v-if="loading"/>
     <form-wizard
       title="Seleccionar modelo de producto a clasificar"
-      subtitle
+      ref="wizard"
       nextButtonText="Siguiente"
       backButtonText="Atrás"
       finishButtonText="Finalizar"
@@ -23,7 +23,7 @@
                 v-for="fam in productFamilies"
                 :key="fam.id"
                 :class="{ 'selected': selectedFamily === fam }"
-                @click="() => selectedFamily = fam"
+                @click="familySelect(fam)"
               >
                 <p>{{ fam.name }}</p>
               </div>
@@ -43,7 +43,7 @@
                 v-for="mod in familyModels"
                 :key="mod.id"
                 :class="{ 'selected': selectedModel === mod }"
-                @click="() => selectedModel = mod"
+                @click="modelSelect(mod)"
               >
                 <p>{{ mod.name }}</p>
               </div>
@@ -58,11 +58,11 @@
       <template slot="footer" slot-scope="props">
         <div class="wizard-footer-left">
           <wizard-button
-            @click.native="backHandler(props.activeTabIndex, props.prevTab.bind(props), props)"
+            @click.native="backHandler(props.activeTabIndex, props.prevTab, props)"
             class="btn btn-default"
           >{{ prevButtonText(props.activeTabIndex) }}</wizard-button>
         </div>
-        <div class="wizard-footer-right">
+        <!-- <div class="wizard-footer-right">
           <wizard-button
             v-if="!props.isLastStep"
             @click.native="props.nextTab()"
@@ -74,7 +74,7 @@
             @click.native="onComplete"
             class="wizard-footer-right finish-button btn btn-default"
           >{{props.isLastStep ? 'Finalizar' : 'Siguiente'}}</wizard-button>
-        </div>
+        </div> -->
       </template>
     </form-wizard>
   </div>
@@ -91,7 +91,8 @@ export default {
   data() {
     return {
       selectedFamily: null,
-      selectedModel: null
+      selectedModel: null,
+      wizard: null,
     };
   },
   computed: {
@@ -122,8 +123,16 @@ export default {
     ...mapActions([
       "loadProductFamilies",
       "loadModelsForFamily",
-      "selectModel"
+      "selectModel",
     ]),
+    familySelect(fam) {
+      this.selectedFamily = fam;
+      this.wizard.nextTab();
+    },
+    modelSelect(mod) {
+      this.selectedModel = mod;
+      this.onComplete();
+    },
     loadProductModels() {
       if (this.hasFamilyError) {
         return false;
@@ -160,7 +169,8 @@ export default {
     if (Object.keys(this.productFamilies).length === 0) {
       this.loadProductFamilies();
     }
-  }
+    this.wizard = this.$refs['wizard'];
+  },
 };
 </script>
 
@@ -208,7 +218,7 @@ export default {
     margin-top: 10px;
     padding-top: 15px;
     padding-bottom: 15px;
-    background-color: #66615B;
+    background-color: #66615b;
   }
 }
 </style>

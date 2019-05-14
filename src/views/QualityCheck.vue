@@ -2,7 +2,7 @@
   <div class="q-check bg-white d-flex flex-column align-items-center">
     <h4>Evaluación de Calidad</h4>
     <div class="row classification-summary bg-nude">
-      <div class="col-6 d-flex flex-column">
+      <div class="col-7 d-flex flex-column">
         <div
           v-for="(item, index) in summaryData"
           :key="index"
@@ -12,11 +12,11 @@
             <p class="label">{{ item.label }}:</p>
             <p class="value">{{ item.value }}</p>
           </div>
-          <router-link class="btn btn-default" :to="item.route">Editar</router-link>
+          <router-link class="btn btn-default" v-if="item.route" :to="item.route">Editar</router-link>
           <!-- <button class="btn btn-default" v-if="item.action" @click="item.action">Editar</button> -->
         </div>
       </div>
-      <div class="col-6 d-flex flex-column">
+      <div class="col-5 d-flex flex-column">
         <div
           v-for="(item, index) in wagonOperators"
           :key="index"
@@ -26,7 +26,7 @@
             <p class="label">{{ item.label }}:</p>
             <p class="value">{{ item.value }}</p>
           </div>
-          <router-link class="btn btn-default" :to="item.route">Editar</router-link>
+          <router-link class="btn btn-default" v-if="item.route" :to="item.route">Editar</router-link>
           <!-- <button class="btn btn-default" v-if="item.action" @click="item.action">Editar</button> -->
         </div>
       </div>
@@ -85,12 +85,12 @@ export default {
         },
         {
           label: "Modelo",
-          value: this.currentClassification.productModel.name,
+          value: this.currentClassification.productModel ? this.currentClassification.productModel.name : 'No seleccionado',
           route: "model-selection"
         },
         {
           label: "Color",
-          value: this.currentClassification.color.name,
+          value: this.currentClassification.color ? this.currentClassification.color.name : 'No seleccionado',
           route: "color-selection"
         }
       ];
@@ -164,6 +164,9 @@ export default {
   methods: {
     ...mapActions(["saveClassification"]),
     onSubmit() {
+      if (!this.validate()) {
+        return;
+      }
       this.$bvModal.show("confirm-modal");
     },
     onFinish() {
@@ -171,12 +174,39 @@ export default {
       this.$router.push("home");
     },
     goToAddDefect() {
+      if (!this.currentClassification.productModel) {
+        this.$notify({ message: 'Seleccione el producto a clasificar', type: 'danger' });
+        return;
+      }
       this.tmpDefect = {};
       this.$router.push("defect-area-selection");
     },
     goToQualitySelect() {
       this.$router.push("quality-selection");
-    }
+    },
+    validate() {
+      if (!this.currentClassification.productModel) {
+        this.$notify({ message: 'Seleccione el producto a clasificar', type: 'danger' });
+        return false;
+      }
+      if (!this.currentClassification.color) {
+        this.$notify({ message: 'Seleccione el color del producto', type: 'danger' });
+        return false;
+      }
+      if (!this.currentClassification.castOperator) {
+        this.$notify({ message: 'Seleccione el colador', type: 'danger' });
+        return false;
+      }
+      if (!this.currentClassification.coatOperator) {
+        this.$notify({ message: 'Seleccione el barnizador', type: 'danger' });
+        return false;
+      }
+      if (!this.currentClassification.polishOperator) {
+        this.$notify({ message: 'Seleccione el pulidor', type: 'danger' });
+        return false;
+      }
+      return true;
+    },
   }
 };
 </script>

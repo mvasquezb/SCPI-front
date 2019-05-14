@@ -22,7 +22,7 @@
     </div>
     <div class="row w-100 mx-1 my-2">
       <div class="col-12 footer">
-        <button class="btn btn-default btn-back" @click="$router.back">Volver</button>
+        <button class="btn btn-default btn-back" @click="$router.back()">Volver</button>
         <button class="btn btn-default btn-next" @click="onFinish">Finalizar registro</button>
       </div>
     </div>
@@ -44,6 +44,9 @@ export default {
   },
   computed: {
     ...mapState(["defectAreas", "loading", "operationError", "operationSuccessful", "tmpDefect"]),
+    hasError() {
+      return this.selectedDefectArea == null;
+    }
   },
   methods: {
     ...mapActions(["loadDefectAreas", "selectDefectArea"]),
@@ -53,7 +56,7 @@ export default {
     },
     onFinish() {
       this.$router.push('quality-check');
-    }
+    },
   },
   mounted() {
     if (Object.keys(this.defectAreas).length === 0) {
