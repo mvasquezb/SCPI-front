@@ -1,5 +1,6 @@
 <template>
   <div>
+    <LoadingSpinner v-if="loading"/>
     <div v-if="hasOpenShift" class="home bg-white">
       <div class="row">
         <div class="col-12 text-center">
@@ -27,7 +28,7 @@
           <div class="row bg-nude shift-info-actions">
             <div class="col-md-9 bg-white d-flex piece-counters">
               <ClassifiedCounter
-                v-for="(value, name, index) in pieceClassifications"
+                v-for="(value, name, index) in shift.pieceClassifications"
                 :key="index"
                 :title="name"
                 :value="value"
@@ -57,6 +58,7 @@ import ClassifiedCounter from '@/components/ClassifiedCounter.vue';
 import OvenData from '@/components/OvenData.vue';
 import ClassificationData from '@/components/ClassificationData.vue';
 import CreateShiftForm from '@/components/CreateShiftForm.vue';
+import LoadingSpinner from '@/components/LoadingSpinner.vue';
 
 @Component({
   components: {
@@ -66,9 +68,10 @@ import CreateShiftForm from '@/components/CreateShiftForm.vue';
     OvenData,
     ClassificationData,
     CreateShiftForm,
+    LoadingSpinner,
   },
   computed: {
-    ...mapState(['factoryOvens', 'creatingShift', 'currentClassification', 'startWagonsPerOven']),
+    ...mapState(['factoryOvens', 'creatingShift', 'currentClassification', 'startWagonsPerOven', 'loading']),
     shift: mapState(['currentShift']).currentShift,
   },
   methods: {
@@ -76,21 +79,12 @@ import CreateShiftForm from '@/components/CreateShiftForm.vue';
   },
 })
 export default class Home extends Vue {
-  pieceClassifications = {};
   classificationData = {};
 
   created() {
     if (!Object.keys(this.factoryOvens).length) {
       this.loadFactoryOvens();
     }
-    
-    this.pieceClassifications = {
-      "estandar": 21,
-      "comercial": 11,
-      "rotura": 7,
-      "resane": 1,
-      "evaluacion": 3
-    };
 
     this.classificationData = {
       id: 1,
@@ -135,7 +129,7 @@ export default class Home extends Vue {
   get currentClassData() {
     return {
       quantity: this.classificationData.quantity,
-      wagon: this.currentClassification.currentWagon,
+      wagon: this.currentWagon,
       defect: this.classificationData.currentDefect,
       location: this.classificationData.location,
     };
@@ -154,14 +148,14 @@ export default class Home extends Vue {
       productModel: this.currentClassification.productModel,
       color: this.currentClassification.color,
       currentOven: this.currentClassification.currentOven,
-      coatOperator: this.currentWagon.coatOperator || {},
-      castOperator: this.currentWagon.castOperator || {},
-      polishOperator: this.currentWagon.polishOperator || {},
+      coatOperator: (this.currentWagon || {}).coatOperator,
+      castOperator: (this.currentWagon || {}).castOperator,
+      polishOperator: (this.currentWagon || {}).polishOperator,
     };
   }
 
   get totalClassifiedPieces() {
-    return Object.values(this.pieceClassifications).reduce((acc, val) => acc + val);
+    return Object.values(this.shift.pieceClassifications).reduce((acc, val) => acc + val);
   }
 }
 </script>

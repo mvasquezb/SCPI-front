@@ -16,6 +16,8 @@ import PieceZoneSelection from '@/views/PieceZoneSelection.vue';
 import QualitySelection from '@/views/QualitySelection.vue';
 import RepairSelection from '@/views/RepairSelection.vue';
 import EvaluationSelection from '@/views/EvaluationSelection.vue';
+import CastDateSelection from '@/views/CastDateSelection.vue';
+import WagonPositionSelection from '@/views/WagonPositionSelection.vue';
 
 Vue.use(Router)
 
@@ -97,6 +99,16 @@ const routes = [
         path: 'evaluation-selection',
         name: 'evaluation-selection',
         component: EvaluationSelection,
+      },
+      {
+        path: 'castDate-selection',
+        name: 'castDate-selection',
+        component: CastDateSelection,
+      },
+      {
+        path: 'wagon-position-selection',
+        name: 'wagon-position-selection',
+        component: WagonPositionSelection,
       },
     ]
   },

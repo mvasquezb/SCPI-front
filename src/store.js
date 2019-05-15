@@ -32,6 +32,7 @@ export default new Vuex.Store({
     qualityLevels: [],
     repairTypes: [],
     evaluationTypes: [],
+    redirectTo: ''
   },
   mutations: {
     initialiseStore(state) {
@@ -56,7 +57,12 @@ export default new Vuex.Store({
       state.currentUser = null;
     },
     factoryOvensLoaded: (state, ovens) => {
-      state.factoryOvens = ovens;
+      state.factoryOvens = ovens.map((o) => {
+        return {
+          ...o,
+          wagons: o.wagons[1]
+        };
+      });
     },
     addStartWagon: (state, wagon) => {
       state.tmpStartWagons = {
@@ -81,7 +87,16 @@ export default new Vuex.Store({
       state.operationError = result.error;
       state.operationSuccessful = result.error == null;
       if (state.operationSuccessful) {
-        state.currentShift = result.data;
+        state.currentShift = {
+          ...result.data,
+          pieceClassifications: {
+            "estandar": 0,
+            "comercial": 0,
+            "rotura": 0,
+            "resane": 0,
+            "evaluacion": 0
+          },
+        };
         state.tmpShiftCode = null;
         state.startWagonsPerOven = { ...state.tmpStartWagons };
         state.tmpStartWagons = null;
@@ -120,6 +135,7 @@ export default new Vuex.Store({
       state.currentClassification = {
         ...state.currentClassification,
         productModel: model,
+        product: model,
         productFamily: model.productFamily,
       };
     },
@@ -181,12 +197,14 @@ export default new Vuex.Store({
       state.classifications.push(state.currentClassification);
       state.currentClassification = {
         ...state.currentClassification,
+        quantity: 1,
         currentWagon: wagon,
+        productionWagon: wagon,
         currentOven: oven,
         polishOperator: wagon.polishOperator,
         coatOperator: wagon.coatOperator,
         castOperator: wagon.castOperator,
-        pieceClassification: {},
+        classifierOperator: state.currentUser,
       };
     },
     classificationSaved: (state, classification) => {
@@ -194,7 +212,19 @@ export default new Vuex.Store({
       state.currentClassification = {
         ...state.currentClassification,
         defects: [],
-        pieceClassification: {},
+        quantity: 1,
+        assignedQualityLevel: null,
+        systemQualityLevel: null,
+      };
+      let pieces = state.currentShift.pieceClassifications;
+      let q = classification.assignedQualityLevel || classification.systemQualityLevel;
+      let qName = q.name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, "");
+      state.currentShift = {
+        ...state.currentShift,
+        pieceClassifications: {
+          ...pieces,
+          [qName]: pieces[qName] + classification.quantity,
+        },
       };
     },
     qualityLevelsLoaded: (state, qualities) => {
@@ -222,7 +252,6 @@ export default new Vuex.Store({
       };
     },
     pieceZonesLoaded: (state, { key, data }) => {
-      console.log(key, data, data.map((pz) => pz.pieceZone));
       state.pieceZones = {
         ...state.pieceZones,
         [key]: data.map((pz) => pz.pieceZone),
@@ -235,11 +264,15 @@ export default new Vuex.Store({
       };
     },
     defectSaved: (state, defect) => {
+      defect = {
+        ...defect,
+        className: 'com.pmvb.scpiback.data.models.Defect'
+      };
       let defects = state.currentClassification.defects || [];
       defects.push(defect);
       state.currentClassification = {
         ...state.currentClassification,
-        defects: defects,
+        defects,
       };
       state.tmpDefect = null;
     },
@@ -271,12 +304,31 @@ export default new Vuex.Store({
     evaluationTypesLoaded: (state, evaluationTypes) => {
       state.evaluationTypes = evaluationTypes;
     },
+    castDateSelected: (state, castingDate) => {
+      state.currentClassification = {
+        ...state.currentClassification,
+        castingDate,
+      };
+    },
+    wagonPositionSelected: (state, wagonPosition) => {
+      state.currentClassification = {
+        ...state.currentClassification,
+        wagonPosition,
+      };
+    },
+    qualityEvaluated: (state, { qualityLevel, facts }) => {
+      state.currentClassification = {
+        ...state.currentClassification,
+        systemQualityLevel: qualityLevel,
+        systemFoundFacts: facts,
+      };
+    },
   },
   actions: {
     doLogin({ commit }, loginData) {
       commit('loginStart');
 
-      http.post('login', { ...loginData })
+      http.post('login', { ...loginData, className: 'java.util.Map' })
         .then((r) => {
           commit('loginFinish', r.data);
         })
@@ -299,13 +351,14 @@ export default new Vuex.Store({
     },
     createShift({ commit }) {
       commit('operationStart');
-      http.post(`/users/${this.state.currentUser.id}/create-shift`, { shiftCode: this.state.tmpShiftCode })
+      http.post(`/users/${this.state.currentUser.id}/create-shift`, { shiftCode: this.state.tmpShiftCode, className: 'java.util.Map' })
         .then((r) => commit('createShift', r))
-        .catch((e) => commit('createShift', { error: e }));
+        .catch((e) => commit('createShift', { error: e }))
+        .finally(() => commit('operationFinish'));
     },
     loadProductFamilies({ commit }) {
       commit('operationStart');
-      http.get('/product-families')
+      http.get('/product-families?not-empty')
         .then((r) => commit('loadProductFamilies', r))
         .catch((e) => commit('loadProductFamilies', { error: e }));
     },
@@ -352,7 +405,27 @@ export default new Vuex.Store({
       commit('classificationCreated', payload);
     },
     saveClassification({ commit }, classification) {
-      commit('classificationSaved', classification);
+      commit('operationStart');
+      
+      classification = {
+        ...classification,
+        currentOven: {
+          ...classification.currentOven,
+          wagons: [
+            'java.util.ArrayList',
+            classification.currentOven.wagons
+          ]
+        },
+        defects: [
+          'java.util.ArrayList',
+          [...classification.defects]
+        ]
+      };
+      
+      http.post('/classification', classification)
+        .then((r) => commit('classificationSaved', r.data))
+        .catch((e) => commit('operationError', e))
+        .finally(() => commit('operationFinish'));
     },
     loadQualityLevels({ commit }) {
       commit('operationStart');
@@ -420,6 +493,25 @@ export default new Vuex.Store({
 
       http.get(`/evaluation-types`)
         .then((r) => commit('evaluationTypesLoaded', r.data))
+        .catch((e) => commit('operationError', e))
+        .finally(() => commit('operationFinish'));
+    },
+    selectCastDate({ commit }, castDate) {
+      commit('castDateSelected', castDate);
+    },
+    selectWagonPosition({ commit }, wagonPosition) {
+      commit('wagonPositionSelected', wagonPosition);
+    },
+    systemEvaluate({ commit }, defects) {
+      commit('operationStart');
+
+      let def = [
+        'java.util.ArrayList',
+        [...defects]
+      ];
+
+      http.post('/quality-check', def)
+        .then((r) => commit('qualityEvaluated', r.data))
         .catch((e) => commit('operationError', e))
         .finally(() => commit('operationFinish'));
     },

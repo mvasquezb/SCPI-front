@@ -4,7 +4,10 @@
       <div class="col-3">
         <h4>{{ oven.code }}</h4>
       </div>
-      <div class="col-3 offset-6 text-right">
+      <div class="col-7 text-center d-flex align-items-center">
+        <p class="text-dark m-0">Seleccione la vagoneta a clasificar</p>
+      </div>
+      <div class="col-2 text-right">
         <h4>*Prod</h4>
       </div>
     </div>

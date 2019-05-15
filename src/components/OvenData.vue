@@ -78,7 +78,7 @@ export default {
   flex-direction: column;
   justify-content: space-evenly;
   margin: 5px;
-  padding: 5px 15px;
+  padding: 5px 10px;
   text-align: center;
 
   p {

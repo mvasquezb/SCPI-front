@@ -51,7 +51,7 @@ export default {
         },
         {
           title: "Ubicación",
-          value: { ...this.location, repr: this.location.code }
+          value: { ...this.location, repr: this.location.name }
         },
         {
           title: "Vagoneta",

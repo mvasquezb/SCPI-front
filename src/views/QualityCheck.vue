@@ -1,5 +1,6 @@
 <template>
   <div class="q-check bg-white d-flex flex-column align-items-center">
+    <LoadingSpinner v-if="loading"/>
     <h4>Evaluación de Calidad</h4>
     <div class="row classification-summary bg-nude">
       <div class="col-7 d-flex flex-column">
@@ -60,7 +61,7 @@
       <template slot="modal-footer" slot-scope="{ ok, hide }">
         <b-button variant="danger" @click="hide()">Cancelar</b-button>
         <b-button variant="info" @click="$router.push('quality-selection')">Seleccionar otro</b-button>
-        <b-button variant="success" @click="ok()">Confirmar</b-button>
+        <b-button v-if="systemQualityLevel" variant="success" @click="ok()">Confirmar</b-button>
         <!-- Button with custom close trigger value -->
       </template>
     </b-modal>
@@ -69,10 +70,14 @@
 
 <script>
 import { mapState, mapActions } from "vuex";
+import LoadingSpinner from "@/components/LoadingSpinner.vue";
 
 export default {
+  components: {
+    LoadingSpinner
+  },
   computed: {
-    ...mapState(["currentClassification"]),
+    ...mapState(["currentClassification", "loading"]),
     summaryData() {
       return [
         {
@@ -85,12 +90,16 @@ export default {
         },
         {
           label: "Modelo",
-          value: this.currentClassification.productModel ? this.currentClassification.productModel.name : 'No seleccionado',
+          value: this.currentClassification.productModel
+            ? this.currentClassification.productModel.name
+            : "No seleccionado",
           route: "model-selection"
         },
         {
           label: "Color",
-          value: this.currentClassification.color ? this.currentClassification.color.name : 'No seleccionado',
+          value: this.currentClassification.color
+            ? this.currentClassification.color.name
+            : "No seleccionado",
           route: "color-selection"
         }
       ];
@@ -147,9 +156,11 @@ export default {
     },
     systemQualityText() {
       if (!this.systemQualityLevel) {
-        return "Se requiere más información";
+        return "No se pudo llegar a una conclusión sobre el nivel de calidad del producto";
       }
-      let text = this.systemQualityLevel.name;
+      let text = `Se ha determinado el nivel de calidad: ${
+        this.systemQualityLevel.name
+      }`;
       if (this.systemQualityLevel.code == "S") {
         return `${text} - ${this.currentClassification.repair.repairType.name}`;
       }
@@ -162,23 +173,41 @@ export default {
     }
   },
   methods: {
-    ...mapActions(["saveClassification"]),
+    ...mapActions(["saveClassification", "systemEvaluate"]),
     onSubmit() {
       if (!this.validate()) {
         return;
       }
+      this.systemEvaluate(this.currentClassification.defects);
       this.$bvModal.show("confirm-modal");
     },
     onFinish() {
-      this.saveClassification(this.currentClassification);
-      this.$router.push("home");
+      let qLevels = {
+        system: this.systemQualityLevel,
+        assigned: this.assignedQualityLevel
+      };
+      if (qLevels.system.code == "R" && qLevels.assigned == null) {
+        this.$router.push("castDate-selection");
+      } else {
+        this.saveClassification(this.currentClassification);
+        this.$notify({
+          message: "Se guardó la clasificación exitosamente",
+          type: "info"
+        });
+        this.$router.push("home");
+      }
     },
     goToAddDefect() {
       if (!this.currentClassification.productModel) {
-        this.$notify({ message: 'Seleccione el producto a clasificar', type: 'danger' });
+        this.$notify({
+          message: "Seleccione el producto a clasificar",
+          type: "danger"
+        });
         return;
       }
-      this.tmpDefect = {};
+      this.tmpDefect = {
+        className: "com.pmvb.scpiback.data.models.Defect"
+      };
       this.$router.push("defect-area-selection");
     },
     goToQualitySelect() {
@@ -186,27 +215,33 @@ export default {
     },
     validate() {
       if (!this.currentClassification.productModel) {
-        this.$notify({ message: 'Seleccione el producto a clasificar', type: 'danger' });
+        this.$notify({
+          message: "Seleccione el producto a clasificar",
+          type: "danger"
+        });
         return false;
       }
       if (!this.currentClassification.color) {
-        this.$notify({ message: 'Seleccione el color del producto', type: 'danger' });
+        this.$notify({
+          message: "Seleccione el color del producto",
+          type: "danger"
+        });
         return false;
       }
       if (!this.currentClassification.castOperator) {
-        this.$notify({ message: 'Seleccione el colador', type: 'danger' });
+        this.$notify({ message: "Seleccione el colador", type: "danger" });
         return false;
       }
       if (!this.currentClassification.coatOperator) {
-        this.$notify({ message: 'Seleccione el barnizador', type: 'danger' });
+        this.$notify({ message: "Seleccione el barnizador", type: "danger" });
         return false;
       }
       if (!this.currentClassification.polishOperator) {
-        this.$notify({ message: 'Seleccione el pulidor', type: 'danger' });
+        this.$notify({ message: "Seleccione el pulidor", type: "danger" });
         return false;
       }
       return true;
-    },
+    }
   }
 };
 </script>

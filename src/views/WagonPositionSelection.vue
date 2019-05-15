@@ -1,21 +1,27 @@
 <template>
-  <div class="row bg-white quality-selection">
+  <div class="row bg-white color-selection">
     <LoadingSpinner v-if="loading"/>
-    <h4 class="col-12 text-center form-title">Nivel de Calidad</h4>
+    <h4 class="col-12 text-center form-title">Posición en la vagoneta</h4>
     <div class="grid-container row col-12">
-      <div class="col-5 text-center">
-        <h4>Seleccione el nivel de calidad del producto</h4>
+      <div class="col-5 text-center d-flex flex-column">
+        <h4>Seleccione la posición en la vagoneta</h4>
+        <div class="legend d-flex flex-column text-left">
+          <p class="legend-title">Posición:</p>
+          <div class="legend-items d-flex justify-content-between">
+            <p v-for="(item, index) in legendItems" :key="index" class="legend-item">{{ item }}</p>
+          </div>
+        </div>
       </div>
       <div class="col-7">
         <div class="row grid" :class="{ 'error': hasError }">
           <div
             class="col-3 grid-item d-flex justify-content-center align-items-center bg-nude"
-            v-for="quality in qualityLevels"
-            :key="quality.id"
-            :class="{ 'selected': selectedQuality === quality }"
-            @click="() => selectedQuality = quality"
+            v-for="position in wagonPositions"
+            :key="position"
+            :class="{ 'selected': selectedPosition === position }"
+            @click="() => selectedPosition = position"
           >
-            <p>{{ quality.name }}</p>
+            <p>{{ position }}</p>
           </div>
         </div>
       </div>
@@ -23,7 +29,6 @@
     <div class="row w-100 mx-1 my-2">
       <div class="col-12 footer">
         <button class="btn btn-default btn-back" @click="() => $router.back()">Volver</button>
-        <!-- <button class="btn btn-default btn-next" @click="onSubmit">Aceptar</button> -->
       </div>
     </div>
   </div>
@@ -39,60 +44,34 @@ export default {
   },
   data() {
     return {
-      selectedQuality: null
+      selectedPosition: null,
+      wagonPositions: [
+        'IE', 'CE', 'DE', 'IB', 'CB', 'DB'
+      ],
+      legendItems: [
+        'I: Izquierda', 'C: Centro', 'D: Derecha',
+        'E: Elevada', 'B: Baja'
+      ]
     };
   },
   computed: {
-    ...mapState([
-      "qualityLevels",
-      "loading",
-      "operationError",
-      "operationSuccessful",
-      "currentClassification",
-    ]),
+    ...mapState(["currentClassification", "loading", "operationError", "operationSuccessful"]),
     hasError() {
-      return this.selectedQuality == null;
+      return this.selectedPosition == null;
     }
   },
   methods: {
-    ...mapActions(["loadQualityLevels", "selectQuality", 'saveClassification']),
+    ...mapActions(["selectWagonPosition", "saveClassification"]),
     onSubmit() {
-      this.selectQuality(this.selectedQuality);
-      this.nextPage();
-    },
-    nextPage() {
-      switch (this.selectedQuality.code) {
-        case 'S': {
-          // Resane
-          this.$router.push('repair-selection');
-          break;
-        }
-        case 'V': {
-          // Evaluación
-          this.$router.push('evaluation-selection');
-          break;
-        }
-        case 'R': {
-          // Rotura
-          this.$router.push('castDate-selection');
-          break;
-        }
-        default: {
-          this.saveClassification(this.currentClassification);
-          this.$notify({ message: 'Se guardó la clasificación exitosamente', type: 'info' });
-          this.$router.push('home');
-        }
-      }
-    }
-  },
-  mounted() {
-    if (Object.keys(this.qualityLevels).length === 0) {
-      this.loadQualityLevels();
+      this.selectWagonPosition(this.selectedPosition);
+      this.saveClassification(this.currentClassification);
+      this.$notify({ message: 'Se guardó la clasificación exitosamente', type: 'info' });
+      this.$router.push("home");
     }
   },
   watch: {
-    selectedQuality() {
-      if (this.selectedQuality) {
+    selectedPosition() {
+      if (this.selectedPosition) {
         this.onSubmit();
       }
     }
@@ -101,11 +80,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.wizard-title {
-  color: #252422;
-  font-weight: 300;
-  margin: 0;
-  text-align: center;
+.legend-title {
+  font-weight: bold;
+  font-size: 1.1rem;
 }
 
 .grid {
@@ -126,7 +103,7 @@ export default {
 .grid-item {
   border: 1px solid black;
   margin: 5px;
-  padding: 20px;
+  padding: 10px;
   display: flex;
   flex-direction: column-reverse;
 
@@ -145,6 +122,10 @@ export default {
     text-align: center;
     width: 100%;
     text-overflow: ellipsis;
+  }
+
+  .color-container {
+    width: 100%;
   }
 }
 
