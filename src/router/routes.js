@@ -18,6 +18,7 @@ import RepairSelection from '@/views/RepairSelection.vue';
 import EvaluationSelection from '@/views/EvaluationSelection.vue';
 import CastDateSelection from '@/views/CastDateSelection.vue';
 import WagonPositionSelection from '@/views/WagonPositionSelection.vue';
+import RuleIndex from '@/views/RuleIndex.vue';
 
 Vue.use(Router)
 
@@ -109,6 +110,11 @@ const routes = [
         path: 'wagon-position-selection',
         name: 'wagon-position-selection',
         component: WagonPositionSelection,
+      },
+      {
+        path: 'rules',
+        name: 'rules',
+        component: RuleIndex,
       },
     ]
   },

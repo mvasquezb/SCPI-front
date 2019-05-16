@@ -32,7 +32,8 @@ export default new Vuex.Store({
     qualityLevels: [],
     repairTypes: [],
     evaluationTypes: [],
-    redirectTo: ''
+    redirectTo: '',
+    allRules: [],
   },
   mutations: {
     initialiseStore(state) {
@@ -323,6 +324,17 @@ export default new Vuex.Store({
         systemFoundFacts: facts,
       };
     },
+    rulesLoaded: (state, rules) => {
+      state.allRules = rules.map((r) => {
+        return {
+          ...r,
+          consequent: `${r.consequentName} = ${r.consequentValue}`
+        };
+      });
+    },
+    ruleDeleted: (state, rule) => {
+      state.allRules = state.allRules.filter((r) => r.id != rule.id);
+    }
   },
   actions: {
     doLogin({ commit }, loginData) {
@@ -512,6 +524,22 @@ export default new Vuex.Store({
 
       http.post('/quality-check', def)
         .then((r) => commit('qualityEvaluated', r.data))
+        .catch((e) => commit('operationError', e))
+        .finally(() => commit('operationFinish'));
+    },
+    loadAllRules({ commit }) {
+      commit('operationStart');
+      
+      http.get('/rules')
+        .then((r) => commit('rulesLoaded', r.data))
+        .catch((e) => commit('operationError', e))
+        .finally(() => commit('operationFinish'));
+    },
+    deleteRuleById({ commit }, rule) {
+      commit('operationStart');
+      
+      http.delete(`/rules/${rule.id}`)
+        .then((r) => commit('ruleDeleted', r.data))
         .catch((e) => commit('operationError', e))
         .finally(() => commit('operationFinish'));
     },
