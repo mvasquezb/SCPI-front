@@ -19,6 +19,7 @@ import EvaluationSelection from '@/views/EvaluationSelection.vue';
 import CastDateSelection from '@/views/CastDateSelection.vue';
 import WagonPositionSelection from '@/views/WagonPositionSelection.vue';
 import RuleIndex from '@/views/RuleIndex.vue';
+import RuleDetail from '@/views/RuleDetail.vue';
 
 Vue.use(Router)
 
@@ -116,6 +117,11 @@ const routes = [
         name: 'rules',
         component: RuleIndex,
       },
+      {
+        path: '/rules/:ruleId',
+        name: 'rule-detail',
+        component: RuleDetail
+      }
     ]
   },
   {

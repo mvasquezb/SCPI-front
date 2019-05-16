@@ -29,7 +29,7 @@
       <div class="">
         <div class="container">
           <div class="row">
-            <div class="col-md-8 col-md-offset-2 text-center">
+            <div class="col-12 col-md-8 offset-2 text-center">
               <h2 class="title text-danger">404 Not Found</h2>
               <h2 class="title">Oops! Parece que esta página no existe.</h2>
             </div>

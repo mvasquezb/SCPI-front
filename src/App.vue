@@ -1,12 +1,19 @@
 <template>
   <div :class="{'nav-open': $sidebar.showSidebar}">
     <notifications></notifications>
+    <LoadingSpinner v-if="loading" />
     <router-view></router-view>
   </div>
 </template>
 
 <script>
-export default {};
+import { mapState } from 'vuex';
+
+export default {
+  computed: {
+    ...mapState(["loading", "operationError", "operationSuccessful"]),
+  },
+};
 </script>
 
 <style lang="scss">

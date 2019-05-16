@@ -130,9 +130,6 @@ export default {
       this.totalRows = filteredItems.length;
       this.currentPage = 1;
     },
-    editRule(rule) {
-      this.$router.push(`/rules/${rule.id}`);
-    },
     deleteRule(rule) {
       this.deleteRuleById(rule);
       this.$notify({ message: 'Se eliminó la regla exitosamente', type: 'info' });

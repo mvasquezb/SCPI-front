@@ -12,6 +12,7 @@ import "vue-notifyjs/themes/default.css";
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 import 'vue-form-wizard/dist/vue-form-wizard.min.css';
 import 'vue-touch-keyboard/dist/vue-touch-keyboard.css';
+import '@fortawesome/fontawesome-free/css/all.css';
 
 Vue.config.productionTip = false
 

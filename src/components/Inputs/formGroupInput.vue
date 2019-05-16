@@ -10,12 +10,14 @@
         <i :class="addonLeftIcon" class="input-group-text"></i>
       </span>
     </slot>
-    <input
+    <component :is="tag"
       :value="value"
       @input="$emit('input',$event.target.value)"
       v-bind="$attrs"
       class="form-control"
+      :class="inputClass"
       aria-describedby="addon-right addon-left">
+    </component>
     <slot></slot>
     <slot name="addonRight">
       <span v-if="addonRightIcon" class="input-group-append">
@@ -32,7 +34,15 @@
       label: String,
       value: [String, Number],
       addonRightIcon: String,
-      addonLeftIcon: String
+      addonLeftIcon: String,
+      tag: {
+        type: String,
+        default: "input"
+      },
+      inputClass: {
+        type: String,
+        default: ""
+      }
     },
     computed: {
       hasIcon() {
