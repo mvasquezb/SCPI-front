@@ -19,7 +19,7 @@
           </b-col>
 
           <div class="col-3 text-right">
-            <button class="btn btn-default">Nueva Regla</button>
+            <router-link class="btn btn-default" to="/rules/new">Nueva Regla</router-link>
           </div>
         </div>
       </div>
@@ -41,7 +41,7 @@
           @filtered="onFiltered"
         >
           <template slot="index" slot-scope="row">
-            {{ row.index + 1 }}
+            {{ (currentPage - 1) * perPage + row.index + 1 }}
           </template>
 
           <template slot="actions" slot-scope="row">

@@ -7,9 +7,13 @@
 </template>
 
 <script>
+import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import { mapState } from 'vuex';
 
 export default {
+  components: {
+    LoadingSpinner,
+  },
   computed: {
     ...mapState(["loading", "operationError", "operationSuccessful"]),
   },

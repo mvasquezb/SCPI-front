@@ -8,12 +8,17 @@
       <div class="col-12">
         <div class="row justify-content-center">
           <div class="col-10">
-            <div class="row justify-content-end actions">
+            <div class="row justify-content-between actions mb-2">
+              <div class="col-2">
+                <b-button variant="default" class="ml-0" @click="$router.back()">
+                  <i class="ti-arrow-left"></i> Volver
+                </b-button>
+              </div>
               <div class="col-4 d-flex justify-content-end">
                 <b-button v-if="!isNewRule" variant="danger" @click="confirmDelete">
                   <i class="ti-trash"></i> Eliminar
                 </b-button>
-                <b-button variant="success">
+                <b-button variant="success" @click="addRule">
                   <i class="ti-save"></i> Guardar
                 </b-button>
               </div>
@@ -43,9 +48,14 @@
           </div>
         </div>
         <div v-for="(item, index) in ruleModel.clauses" :key="item.id" class="row clause-row">
-          <div class="col-1 offset-1 pr-0 d-flex align-items-center" v-if="index != 0">
+          <div class="col-1 offset-1 pr-0" v-if="index != 0">
             <div class="row">
-              <b-form-select v-model="item.connector" class="pl-1 connector" required :options="connectors"></b-form-select>
+              <b-form-select
+                v-model="item.connector"
+                class="pl-1 connector"
+                required
+                :options="connectors"
+              ></b-form-select>
             </div>
           </div>
           <!-- <div class="col-10 pl-3" :class="{ 'offset-1': index == 0}"> -->
@@ -57,7 +67,13 @@
                 required
                 placeholder="Parámetro"
                 maxlength="50"
-              ></fg-input>
+                uppercase
+                @input.native="sanitizeParamName($event)"
+              >
+                <template slot="addonHelp">
+                  <button class="form-text text-muted" @click="goToSelectDefect">Seleccionar Defecto</button>
+                </template>
+              </fg-input>
               <b-form-select v-model="item.operator" class="col-2" required :options="operators"/>
               <fg-input
                 v-model="item.value"
@@ -65,6 +81,8 @@
                 required
                 placeholder="Valor"
                 maxlength="50"
+                uppercase
+                @input.native="sanitizeParamName($event)"
               ></fg-input>
             </div>
           </div>
@@ -87,9 +105,24 @@
         <div class="row consequent-row">
           <div class="col-9 offset-2">
             <div class="row w-100 align-items-center">
-              <fg-input v-model="ruleModel.consequentName" class="col-4 my-0" required placeholder="Consecuente" maxlength="20"></fg-input>
+              <fg-input
+                v-model="ruleModel.consequentName"
+                class="col-4 my-0"
+                required
+                placeholder="Consecuente"
+                maxlength="50"
+                uppercase
+                @input.native="sanitizeParamName($event)"
+              ></fg-input>
               <h5 class="col-4 text-center my-0">=</h5>
-              <fg-input v-model="ruleModel.consequentValue" class="col-4 my-0" required placeholder="Valor" maxlength="20"></fg-input>
+              <fg-input
+                v-model="ruleModel.consequentValue"
+                class="col-4 my-0"
+                required
+                placeholder="Valor"
+                maxlength="50"
+                uppercase
+              ></fg-input>
             </div>
           </div>
         </div>
@@ -118,6 +151,7 @@ export default {
     return {
       isNewRule: false,
       ruleModel: {
+        id: 0,
         className: "com.pmvb.scpiback.data.models.Rule",
         clauses: [{ ...this.defaultClause }]
       },
@@ -130,8 +164,8 @@ export default {
       },
       operators: [
         { value: null, text: "Operador" },
-        "=",
-        "<>",
+        { value: "==", text: "=" },
+        { value: "!=", text: "<>" },
         ">",
         ">=",
         "<",
@@ -148,7 +182,7 @@ export default {
     ...mapState(["loading", "allRules"])
   },
   methods: {
-    ...mapActions(["loadAllRules", "deleteRuleById"]),
+    ...mapActions(["loadAllRules", "deleteRuleById", "saveRule"]),
     refreshPage(ruleId) {
       this.isNewRule = ruleId == "new";
       if (this.isNewRule) {
@@ -188,23 +222,88 @@ export default {
     deleteClause(index) {
       this.ruleModel.clauses.splice(index, 1);
     },
+    addRule() {
+      if (!this.validate()) {
+        return;
+      }
+      this.saveRule(this.ruleModel).then(() => {
+        this.$notify({
+          message: "Se guardó la regla exitosamente",
+          type: "info"
+        });
+        this.$router.push("/rules");
+      });
+    },
     validate() {
       if (!this.ruleModel.name) {
-        this.$notify({ message: 'Ingrese el nombre de la regla', type: 'danger' });
+        this.$notify({
+          message: "Ingrese el nombre de la regla",
+          type: "danger"
+        });
         return false;
       }
       if (!this.validateClauses()) {
-        this.$notify({ message: 'Corrija los errores en los términos de la regla', type: 'danger'});
+        this.$notify({
+          message: "Corrija los errores en los términos de la regla",
+          type: "danger"
+        });
         return false;
       }
-      if (!this.consequentName || !this.consequentValue) {
-        this.$notify({ message: 'Ingrese los datos del consecuente', type: 'danger'});
+      if (!this.ruleModel.consequentName || !this.ruleModel.consequentValue) {
+        this.$notify({
+          message: "Ingrese los datos del consecuente",
+          type: "danger"
+        });
         return false;
       }
       return true;
     },
     validateClauses() {
+      let size = this.ruleModel.clauses.length;
+      for (let i = 0; i < size; i++) {
+        let clause = this.ruleModel.clauses[i];
+        if (!clause.param) {
+          this.$notify({
+            message: "Ingrese el nombre del parámetro",
+            type: "danger"
+          });
+          return false;
+        }
+        if (i != 0 && !clause.connector) {
+          this.$notify({
+            message: "Seleccione el conector del parámetro",
+            type: "danger"
+          });
+          return false;
+        }
+        if (!clause.operator) {
+          this.$notify({
+            message: "Seleccione el operador del parámetro",
+            type: "danger"
+          });
+          return false;
+        }
+        if (!clause.value) {
+          this.$notify({
+            message: "Ingrese el valor del parámetro",
+            type: "danger"
+          });
+          return false;
+        }
+      }
       return true;
+    },
+    sanitizeParamName($e) {
+      if ($e.target.value.match(/\s+/)) {
+        this.$notify({
+          message: "No se permiten espacios para los nombres de parámetros",
+          type: "danger"
+        });
+      }
+      $e.target.value = $e.target.value.replace(/\s+/g, "_");
+    },
+    goToSelectDefect() {
+      console.log("goToSelectDefect");
     }
   },
   mounted() {
@@ -255,7 +354,7 @@ export default {
       &.btn-delete-clause {
         color: red;
         font-size: 2rem;
-        margin-top: -5px;
+        margin-top: -25px;
       }
     }
   }

@@ -328,12 +328,22 @@ export default new Vuex.Store({
       state.allRules = rules.map((r) => {
         return {
           ...r,
-          consequent: `${r.consequentName} = ${r.consequentValue}`
+          consequent: `${r.consequentName} = ${r.consequentValue}`,
+          clauses: convertRuleToClauses(r),
         };
       });
     },
     ruleDeleted: (state, rule) => {
       state.allRules = state.allRules.filter((r) => r.id != rule.id);
+    },
+    ruleSaved: (state, { old, rule }) => {
+      state.allRules = [
+        ...state.allRules.filter((r) => r.id != rule.id),
+        {
+          ...old,
+          ...rule
+        }
+      ];
     }
   },
   actions: {
@@ -418,7 +428,7 @@ export default new Vuex.Store({
     },
     saveClassification({ commit }, classification) {
       commit('operationStart');
-      
+
       classification = {
         ...classification,
         currentOven: {
@@ -433,7 +443,7 @@ export default new Vuex.Store({
           [...classification.defects]
         ]
       };
-      
+
       http.post('/classification', classification)
         .then((r) => commit('classificationSaved', r.data))
         .catch((e) => commit('operationError', e))
@@ -529,7 +539,7 @@ export default new Vuex.Store({
     },
     loadAllRules({ commit }) {
       commit('operationStart');
-      
+
       http.get('/rules')
         .then((r) => commit('rulesLoaded', r.data))
         .catch((e) => commit('operationError', e))
@@ -537,11 +547,86 @@ export default new Vuex.Store({
     },
     deleteRuleById({ commit }, rule) {
       commit('operationStart');
-      
+
       http.delete(`/rules/${rule.id}`)
         .then((r) => commit('ruleDeleted', r.data))
         .catch((e) => commit('operationError', e))
         .finally(() => commit('operationFinish'));
     },
+    saveRule({ commit }, rule) {
+      commit('operationStart');
+
+      compileRuleClauses(rule);
+
+      let url = '/rules';
+      if (rule.id) {
+        url += `/${rule.id}`;
+      }
+
+      // commit('operationFinish');
+      return http.post(url, rule)
+        .then((r) => commit('ruleSaved', { old: rule, rule: r.data }))
+        .catch((e) => commit('operationError', e))
+        .finally(() => commit('operationFinish'));
+    }
   }
 });
+
+function convertClauseValue(value) {
+  let newVal = value;
+  if (value == "true" || value == "false") {
+    if (value == "true") {
+      newVal = "VERDADERO";
+    } else {
+      newVal = "FALSO";
+    }
+  }
+  return newVal;
+}
+
+function convertRuleToClauses(rule) {
+  let clauses = [];
+  let tokens = rule.antecedent.split(/\s+/);
+  clauses.push({
+    param: tokens[0],
+    operator: tokens[1],
+    value: convertClauseValue(tokens[2])
+  });
+  tokens.splice(0, 3);
+  while (tokens.length) {
+    let toks = tokens.splice(0, 4);
+    if (toks.length == 4) {
+      let value = convertClauseValue(toks[3]);
+      clauses.push({
+        connector: toks[0],
+        param: toks[1],
+        operator: toks[2],
+        value: value
+      });
+    }
+  }
+  return clauses;
+}
+
+function compileRuleClauses(rule) {
+  let compiled = rule.clauses.map((c, index) => {
+    let connector = c.connector && index != 0 ? ` ${c.connector} ` : '';
+    return `${connector}${c.param} ${c.operator} ${parseClauseValue(c.value)}`;
+  }).join('');
+
+  rule.antecedent = compiled;
+}
+
+function parseClauseValue(value) {
+  if (value == "VERDADERO") { value = "true" }
+  if (value == "FALSO") { value = "false" }
+  if (value == "true" || value == "false") {
+    return value == "true";
+  }
+
+  if (!isNaN(Number(value))) {
+    return Number(value);
+  }
+
+  return `"${value}"`;
+}
