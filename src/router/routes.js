@@ -16,6 +16,7 @@ import PieceZoneSelection from '@/views/PieceZoneSelection.vue';
 import QualitySelection from '@/views/QualitySelection.vue';
 import RepairSelection from '@/views/RepairSelection.vue';
 import EvaluationSelection from '@/views/EvaluationSelection.vue';
+import QuantitySelection from '@/views/QuantitySelection.vue';
 import CastDateSelection from '@/views/CastDateSelection.vue';
 import WagonPositionSelection from '@/views/WagonPositionSelection.vue';
 import RuleIndex from '@/views/RuleIndex.vue';
@@ -101,6 +102,11 @@ const routes = [
         path: 'evaluation-selection',
         name: 'evaluation-selection',
         component: EvaluationSelection,
+      },
+      {
+        path: 'quantity-selection',
+        name: 'quantity-selection',
+        component: QuantitySelection,
       },
       {
         path: 'castDate-selection',

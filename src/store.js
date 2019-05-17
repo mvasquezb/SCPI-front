@@ -129,10 +129,6 @@ export default new Vuex.Store({
       }
     },
     selectCurrentModel: (state, model) => {
-      // save current classification
-      if (state.currentClassification) {
-        state.classifications.push(state.currentClassification);
-      }
       state.currentClassification = {
         ...state.currentClassification,
         productModel: model,
@@ -195,7 +191,6 @@ export default new Vuex.Store({
       if (state.currentClassification.oven == oven && state.currentClassification.currentWagon == wagon) {
         return;
       }
-      state.classifications.push(state.currentClassification);
       state.currentClassification = {
         ...state.currentClassification,
         quantity: 1,
@@ -344,6 +339,12 @@ export default new Vuex.Store({
           ...rule
         }
       ];
+    },
+    quantitySelected: (state, quantity) => {
+      state.currentClassification = {
+        ...state.currentClassification,
+        quantity
+      };
     }
   },
   actions: {
@@ -444,7 +445,7 @@ export default new Vuex.Store({
         ]
       };
 
-      http.post('/classification', classification)
+      return http.post('/classification', classification)
         .then((r) => commit('classificationSaved', r.data))
         .catch((e) => commit('operationError', e))
         .finally(() => commit('operationFinish'));
@@ -532,7 +533,7 @@ export default new Vuex.Store({
         [...defects]
       ];
 
-      http.post('/quality-check', def)
+      return http.post('/quality-check', def)
         .then((r) => commit('qualityEvaluated', r.data))
         .catch((e) => commit('operationError', e))
         .finally(() => commit('operationFinish'));
@@ -568,6 +569,9 @@ export default new Vuex.Store({
         .then((r) => commit('ruleSaved', { old: rule, rule: r.data }))
         .catch((e) => commit('operationError', e))
         .finally(() => commit('operationFinish'));
+    },
+    selectClassifiedQuantity({ commit }, quantity) {
+      commit('quantitySelected', quantity);
     }
   }
 });

@@ -48,39 +48,48 @@ export default {
       "loading",
       "operationError",
       "operationSuccessful",
-      "currentClassification",
+      "currentClassification"
     ]),
     hasError() {
       return this.selectedQuality == null;
     }
   },
   methods: {
-    ...mapActions(["loadQualityLevels", "selectQuality", 'saveClassification']),
+    ...mapActions(["loadQualityLevels", "selectQuality", "saveClassification"]),
     onSubmit() {
       this.selectQuality(this.selectedQuality);
       this.nextPage();
     },
     nextPage() {
       switch (this.selectedQuality.code) {
-        case 'S': {
+        case "S": {
           // Resane
-          this.$router.push('repair-selection');
+          this.$router.push("repair-selection");
           break;
         }
-        case 'V': {
+        case "V": {
           // Evaluación
-          this.$router.push('evaluation-selection');
+          this.$router.push("evaluation-selection");
           break;
         }
-        case 'R': {
+        case "R": {
           // Rotura
-          this.$router.push('castDate-selection');
+          if ([64, 65].includes(this.currentClassification.productFamily.id)) {
+            // Si es tapa o accesorios
+            this.$router.push("quantity-selection");
+          } else {
+            this.$router.push("castDate-selection");
+          }
           break;
         }
         default: {
-          this.saveClassification(this.currentClassification);
-          this.$notify({ message: 'Se guardó la clasificación exitosamente', type: 'info' });
-          this.$router.push('home');
+          this.saveClassification(this.currentClassification).then(() => {
+            this.$notify({
+              message: "Se guardó la clasificación exitosamente",
+              type: "info"
+            });
+            this.$router.push("home");
+          });
         }
       }
     }

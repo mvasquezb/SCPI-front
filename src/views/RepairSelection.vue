@@ -23,7 +23,7 @@
     <div class="row w-100 mx-1 my-2">
       <div class="col-12 footer">
         <button class="btn btn-default btn-back" @click="() => $router.back()">Volver</button>
-        <button class="btn btn-default btn-next" @click="onSubmit">Aceptar</button>
+        <!-- <button class="btn btn-default btn-next" @click="onSubmit">Aceptar</button> -->
       </div>
     </div>
   </div>
@@ -47,7 +47,8 @@ export default {
       "repairTypes",
       "loading",
       "operationError",
-      "operationSuccessful"
+      "operationSuccessful",
+      "currentClassification"
     ]),
     hasError() {
       return this.selectedRepair == null;
@@ -63,12 +64,35 @@ export default {
       this.nextPage();
     },
     nextPage() {
-      this.$router.push('quality-check');
+      let isBreak = this.currentClassification.systemQualityLevel.code == "R";
+      if (isBreak) {
+        if ([64, 65].includes(this.currentClassification.productFamily.id)) {
+          // Si es tapa o accesorios
+          this.$router.push("quantity-selection");
+        } else {
+          this.$router.push("castDate-selection");
+        }
+        return;
+      }
+      this.saveClassification(this.currentClassification).then(() => {
+        this.$notify({
+          message: "Se guardó la clasificación exitosamente",
+          type: "info"
+        });
+        this.$router.push("home");
+      });
     }
   },
   mounted() {
     if (Object.keys(this.repairTypes).length === 0) {
       this.loadRepairTypes();
+    }
+  },
+  watch: {
+    selectedRepair() {
+      if (this.selectedRepair) {
+        this.onSubmit();
+      }
     }
   }
 };

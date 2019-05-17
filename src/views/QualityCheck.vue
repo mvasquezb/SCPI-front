@@ -178,16 +178,23 @@ export default {
       if (!this.validate()) {
         return;
       }
-      this.systemEvaluate(this.currentClassification.defects);
-      this.$bvModal.show("confirm-modal");
+      this.systemEvaluate(this.currentClassification.defects).then(() =>
+        this.$bvModal.show("confirm-modal")
+      );
     },
     onFinish() {
       let qLevels = {
         system: this.systemQualityLevel,
         assigned: this.assignedQualityLevel
       };
-      if (qLevels.system.code == "R" && qLevels.assigned == null) {
-        this.$router.push("castDate-selection");
+      if (qLevels.system.code == "R") {
+        // Si es rotura
+        if ([64, 65].includes(this.currentClassification.productFamily.id)) {
+          // Si es tapa o accesorios
+          this.$router.push("quantity-selection");
+        } else {
+          this.$router.push("castDate-selection");
+        }
       } else {
         this.saveClassification(this.currentClassification);
         this.$notify({
