@@ -28,6 +28,7 @@
       <div class="col-10">
         <b-table
           show-empty
+          responsive
           stacked="md"
           outlined
           hover
@@ -45,7 +46,7 @@
           </template>
 
           <template slot="actions" slot-scope="row">
-            <div class="d-flex justify-content-between">
+            <div class="d-flex justify-content-between row-actions">
               <router-link
                 :to="`/rules/${row.item.id}`"
                 class="btn btn-sm btn-default"
@@ -57,7 +58,6 @@
                 size="sm"
                 variant="danger"
                 @click="confirmDelete(row.item)"
-                class="mr-1"
                 title="Eliminar"
               >
                 <i class="ti-trash"></i>
@@ -108,11 +108,11 @@ export default {
   data() {
     return {
       fields: [
-        { key: "index", label: "#" },
-        { key: "name", label: "Nombre" },
-        { key: "description", label: "Descripción" },
-        { key: "consequent", label: "Consecuente" },
-        { key: "actions", label: "Acciones" }
+        { key: "index", label: "#"},
+        { key: "name", label: "Nombre", tdClass: "w-20 text-truncate" },
+        { key: "description", label: "Descripción", tdClass: "w-25 text-truncate" },
+        { key: "consequent", label: "Consecuente", tdClass: "w-25" },
+        { key: "actions", label: "Acciones", tdClass: "w-12" }
       ],
       totalRows: 1,
       currentPage: 1,
@@ -161,6 +161,12 @@ export default {
 
   .page-title {
     margin-bottom: 15px;
+  }
+
+  .row-actions {
+    .btn {
+      margin: 0;
+    }
   }
 }
 </style>

@@ -347,3 +347,11 @@ html .clear-completed:active {
   background-color: #c9302c;
   border-color: #ac2925;
 }
+
+.w-20 {
+  width: 20% !important;
+}
+
+.w-12 {
+  width: 12% !important;
+}
