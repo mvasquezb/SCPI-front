@@ -39,10 +39,11 @@ export default {
   data() {
     return {
       selectedZone: null,
+      inRuleMaintenance: false,
     };
   },
   computed: {
-    ...mapState(["currentClassification", "pieceZones", "loading", "operationError", "operationSuccessful", "tmpDefect"]),
+    ...mapState(["currentClassification", "pieceZones", "loading", "operationError", "operationSuccessful", "tmpDefect", "tmpRuleModel"]),
     hasError() {
       return this.selectedZone == null;
     },
@@ -54,15 +55,20 @@ export default {
     },
   },
   methods: {
-    ...mapActions(["loadPieceZones", "selectPieceZone", "saveDefect"]),
+    ...mapActions(["loadPieceZones", "selectPieceZone", "saveDefect", "addDefectToRule"]),
     onSubmit() {
       if (this.hasError) {
         return;
       }
       this.selectPieceZone(this.selectedZone);
-      this.saveDefect(this.tmpDefect);
-      this.$notify({ message: "Defecto registrado", type: "info"});
-      this.$router.push("defect-area-selection");
+      if (this.inRuleMaintenance) {
+        this.addDefectToRule(this.tmpDefect);
+        this.$router.push(`/rules/${(this.tmpRuleModel.id || 0) == 0 ? "new" : this.tmpRuleModel.id}`);
+      } else {
+        this.saveDefect(this.tmpDefect);
+        this.$notify({ message: "Defecto registrado", type: "info"});
+        this.$router.push("defect-area-selection");
+      }
     }
   },
   mounted() {
@@ -80,7 +86,10 @@ export default {
         this.onSubmit();
       }
     }
-  }
+  },
+  beforeRouteEnter(to, from, next) {
+    next((vm) => vm.inRuleMaintenance = from.path.startsWith("/rules"));
+  },
 };
 </script>
 

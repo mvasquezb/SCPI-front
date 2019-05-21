@@ -34,6 +34,7 @@ export default new Vuex.Store({
     evaluationTypes: [],
     redirectTo: '',
     allRules: [],
+    tmpRuleModel: null,
   },
   mutations: {
     initialiseStore(state) {
@@ -336,7 +337,7 @@ export default new Vuex.Store({
         ...state.allRules.filter((r) => r.id != rule.id),
         {
           ...old,
-          ...rule
+          ...rule,
         }
       ];
     },
@@ -345,7 +346,20 @@ export default new Vuex.Store({
         ...state.currentClassification,
         quantity
       };
-    }
+    },
+    tmpRuleModelSet: (state, model) => {
+      state.tmpRuleModel = model ? { ...model } : null;
+    },
+    addedDefectToRule: (state, defect) => {
+      let newClauses = getClausesForDefect(defect);
+      let currentClauses = !state.tmpRuleModel ? [] : [...state.tmpRuleModel.clauses];
+
+      currentClauses.splice(state.tmpRuleModel.factIndex, 0, ...newClauses);
+      state.tmpRuleModel = {
+        ...state.tmpRuleModel,
+        clauses: currentClauses,
+      };
+    },
   },
   actions: {
     doLogin({ commit }, loginData) {
@@ -558,6 +572,7 @@ export default new Vuex.Store({
       commit('operationStart');
 
       compileRuleClauses(rule);
+      rule.consequent = `${rule.consequentName} = ${rule.consequentValue}`;
 
       let url = '/rules';
       if (rule.id) {
@@ -572,6 +587,12 @@ export default new Vuex.Store({
     },
     selectClassifiedQuantity({ commit }, quantity) {
       commit('quantitySelected', quantity);
+    },
+    setTmpRuleModel({ commit }, model) {
+      commit('tmpRuleModelSet', model);
+    },
+    addDefectToRule({ commit }, defect) {
+      commit("addedDefectToRule", defect);
     }
   }
 });
@@ -633,4 +654,16 @@ function parseClauseValue(value) {
   }
 
   return `"${value}"`;
+}
+
+function getClausesForDefect(defect) {
+  let clauses = [];
+  clauses.push({
+    connector: "&&",
+    param: defect.defectType.factName,
+    operator: "==",
+    value: "VERDADERO",
+  });
+  console.log(clauses);
+  return clauses;
 }

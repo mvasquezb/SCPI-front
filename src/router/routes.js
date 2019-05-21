@@ -77,16 +77,19 @@ const routes = [
         path: 'defect-area-selection',
         name: 'defect-area-selection',
         component: DefectAreaSelection,
+        alias: '/rules/defect-area-selection'
       },
       {
         path: 'defect-selection',
         name: 'defect-selection',
         component: DefectSelection,
+        alias: '/rules/defect-selection'
       },
       {
         path: 'pieceZone-selection',
         name: 'pieceZone-selection',
         component: PieceZoneSelection,
+        alias: '/rules/pieceZone-selection'
       },
       {
         path: 'quality-selection',

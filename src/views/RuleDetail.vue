@@ -10,7 +10,7 @@
           <div class="col-10">
             <div class="row justify-content-between actions mb-2">
               <div class="col-2">
-                <b-button variant="default" class="ml-0" @click="$router.back()">
+                <b-button variant="default" class="ml-0" @click="$router.push('/rules')">
                   <i class="ti-arrow-left"></i> Volver
                 </b-button>
               </div>
@@ -71,7 +71,10 @@
                 @input.native="sanitizeParamName($event)"
               >
                 <template slot="addonHelp">
-                  <button class="form-text text-muted" @click="goToSelectDefect">Seleccionar Defecto</button>
+                  <button
+                    class="form-text text-muted"
+                    @click="goToSelectDefect(index)"
+                  >Seleccionar Defecto</button>
                 </template>
               </fg-input>
               <b-form-select v-model="item.operator" class="col-2" required :options="operators"/>
@@ -153,7 +156,8 @@ export default {
       ruleModel: {
         id: 0,
         className: "com.pmvb.scpiback.data.models.Rule",
-        clauses: [{ ...this.defaultClause }]
+        clauses: [{ ...this.defaultClause }],
+        factIndex: null,
       },
       defaultClause: {
         id: 1,
@@ -179,16 +183,27 @@ export default {
     };
   },
   computed: {
-    ...mapState(["loading", "allRules"])
+    ...mapState(["loading", "allRules", "tmpRuleModel"])
   },
   methods: {
-    ...mapActions(["loadAllRules", "deleteRuleById", "saveRule"]),
+    ...mapActions([
+      "loadAllRules",
+      "deleteRuleById",
+      "saveRule",
+      "setTmpRuleModel"
+    ]),
     refreshPage(ruleId) {
+      if (this.tmpRuleModel) {
+        this.ruleModel = { ...this.tmpRuleModel };
+        this.isNewRule = (this.tmpRuleModel.id || 0) == 0;
+        return;
+      }
       this.isNewRule = ruleId == "new";
       if (this.isNewRule) {
         this.ruleModel = {
           className: "com.pmvb.scpiback.data.models.Rule",
-          clauses: [{ ...this.defaultClause }]
+          clauses: [{ ...this.defaultClause }],
+          factIndex: null,
         };
         return;
       }
@@ -226,6 +241,7 @@ export default {
       if (!this.validate()) {
         return;
       }
+      this.setTmpRuleModel(null);
       this.saveRule(this.ruleModel).then(() => {
         this.$notify({
           message: "Se guardó la regla exitosamente",
@@ -302,12 +318,20 @@ export default {
       }
       $e.target.value = $e.target.value.replace(/\s+/g, "_");
     },
-    goToSelectDefect() {
-      console.log("goToSelectDefect");
+    goToSelectDefect(index) {
+      this.ruleModel.factIndex = index;
+      this.setTmpRuleModel(this.ruleModel);
+      this.$router.push("/rules/defect-area-selection");
     }
   },
   mounted() {
     this.refreshPage(this.$route.params.ruleId);
+  },
+  beforeRouteLeave(to, from, next) {
+    if (to.path == "/rules") {
+      this.setTmpRuleModel(null);
+    }
+    next();
   }
 };
 </script>

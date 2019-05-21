@@ -38,7 +38,8 @@ export default {
   },
   data() {
     return {
-      selectedDefect: null
+      selectedDefect: null,
+      inRuleMaintenance: false,
     };
   },
   computed: {
@@ -71,7 +72,10 @@ export default {
         this.onSubmit();
       }
     }
-  }
+  },
+  beforeRouteEnter(to, from, next) {
+    next((vm) => vm.inRuleMaintenance = from.path.startsWith("/rules"));
+  },
 };
 </script>
 
