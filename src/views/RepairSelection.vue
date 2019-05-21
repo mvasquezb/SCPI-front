@@ -55,7 +55,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(["loadRepairTypes", "selectRepairType"]),
+    ...mapActions(["loadRepairTypes", "selectRepairType", "saveClassification"]),
     onSubmit() {
       if (this.hasError) {
         return;
@@ -64,7 +64,9 @@ export default {
       this.nextPage();
     },
     nextPage() {
-      let isBreak = this.currentClassification.systemQualityLevel.code == "R";
+      let isBreak = this.currentClassification.systemQualityLevel
+        ? this.currentClassification.systemQualityLevel.code == "R"
+        : false;
       if (isBreak) {
         if ([64, 65].includes(this.currentClassification.productFamily.id)) {
           // Si es tapa o accesorios

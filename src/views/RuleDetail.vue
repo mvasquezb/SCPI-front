@@ -153,9 +153,12 @@ export default {
   data() {
     return {
       isNewRule: false,
-      ruleModel: {
+      ruleModel: { ...this.defaultRule },
+      defaultRule: {
         id: 0,
         className: "com.pmvb.scpiback.data.models.Rule",
+        name: "",
+        description: "",
         clauses: [{ ...this.defaultClause }],
         factIndex: null,
       },
@@ -200,11 +203,7 @@ export default {
       }
       this.isNewRule = ruleId == "new";
       if (this.isNewRule) {
-        this.ruleModel = {
-          className: "com.pmvb.scpiback.data.models.Rule",
-          clauses: [{ ...this.defaultClause }],
-          factIndex: null,
-        };
+        this.ruleModel = { ...this.defaultRule };
         return;
       }
       let rules = this.allRules.filter(r => r.id == ruleId);
