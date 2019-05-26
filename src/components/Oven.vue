@@ -12,33 +12,33 @@
       </div>
     </div>
     <div class="row">
-      <WagonList class="col-9 wagons" :wagons="oven.wagons" @wagonSelect="selectWagon" />
+      <WagonList class="col-9 wagons" :wagons="oven.wagons" @wagonSelect="selectWagon"/>
       <div class="col-3 wagon-indicators">
-        <DataIndicator title="Vagoneta Inicial" :value="startWagon" />
-        <DataIndicator title="Vagoneta Actual" :value="currentWagon" />
+        <DataIndicator title="Vagoneta Inicial" :value="startWagon"/>
+        <DataIndicator title="Vagoneta Actual" :value="currentWagon"/>
       </div>
     </div>
     <!-- <div class="row d-flex justify-content-center oven-actions">
       <button class="btn btn-main" @click="startQualityCheck">Empezar Clasificación</button>
-    </div> -->
+    </div>-->
   </div>
 </template>
 
 <script>
-import { mapState, mapActions } from 'vuex';
-import WagonList from '@/components/WagonList.vue';
-import DataIndicator from '@/components/DataIndicator.vue';
+import { mapState, mapActions } from "vuex";
+import WagonList from "@/components/WagonList.vue";
+import DataIndicator from "@/components/DataIndicator.vue";
 
 export default {
   props: {
     oven: {
       type: Object,
-      required: true,
-    },
+      required: true
+    }
   },
   data() {
     return {
-      selectedWagon: null,
+      selectedWagon: null
     };
   },
   components: {
@@ -46,16 +46,22 @@ export default {
     DataIndicator
   },
   computed: {
-    ...mapState(['currentClassification', 'startWagonsPerOven']),
+    ...mapState([
+      "currentClassification",
+      "startWagonsPerOven",
+      "productsPerWagon"
+    ]),
     startWagon() {
       return this.startWagonsPerOven[this.oven.id].code;
     },
     currentWagon() {
-      return this.currentClassification.currentWagon ? this.currentClassification.currentWagon.code : '';
+      return this.currentClassification.currentWagon
+        ? this.currentClassification.currentWagon.code
+        : "";
     }
   },
   methods: {
-    ...mapActions(['createClassification']),
+    ...mapActions(["createClassification", "loadProductsForWagon"]),
     selectWagon(wagon) {
       this.selectedWagon = wagon;
     },
@@ -63,8 +69,15 @@ export default {
       // if (!this.validateRequiredQualityCheck()) {
       //   return;
       // }
-      this.createClassification({ oven: this.oven, wagon: this.selectedWagon });
-      this.$router.push('quality-check');
+      this.createClassification({
+        oven: this.oven,
+        wagon: this.selectedWagon,
+      });
+      this.$router.push("quality-check");
+    },
+    wagonHasProducts(productList) {
+      let pieces = productList.filter((p) => p.quantity > p.classifiedPieces);
+      return pieces.length > 0;
     },
     // validateRequiredQualityCheck() {
     //   if (!this.currentClassification.productModel) {
@@ -87,7 +100,32 @@ export default {
       if (this.selectedWagon == null) {
         return;
       }
-      this.startQualityCheck();
+      let key = `${this.oven.id}:${this.selectedWagon.id}`;
+      if (this.productsPerWagon[key]) {
+        if (this.wagonHasProducts(this.productsPerWagon[key])) {
+          this.startQualityCheck();
+        } else {
+          this.$notify({
+            message: "No hay piezas en esta vagoneta",
+            type: "danger"
+          });
+        }
+        return;
+      }
+
+      this.loadProductsForWagon({
+        ovenId: this.oven.id,
+        wagonId: this.selectedWagon.id
+      }).then(res => {
+        if (res.length == 0) {
+          this.$notify({
+            message: "No hay piezas en esta vagoneta",
+            type: "danger"
+          });
+          return;
+        }
+        this.startQualityCheck();
+      });
     }
   }
 };

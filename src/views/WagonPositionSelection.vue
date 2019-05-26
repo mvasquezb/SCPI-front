@@ -45,28 +45,61 @@ export default {
   data() {
     return {
       selectedPosition: null,
-      wagonPositions: [
-        'IE', 'CE', 'DE', 'IB', 'CB', 'DB'
-      ],
+      wagonPositions: ["IE", "CE", "DE", "IB", "CB", "DB"],
       legendItems: [
-        'I: Izquierda', 'C: Centro', 'D: Derecha',
-        'E: Elevada', 'B: Baja'
+        "I: Izquierda",
+        "C: Centro",
+        "D: Derecha",
+        "E: Elevada",
+        "B: Baja"
       ]
     };
   },
   computed: {
-    ...mapState(["currentClassification", "loading", "operationError", "operationSuccessful"]),
+    ...mapState([
+      "currentClassification",
+      "loading",
+      "operationError",
+      "operationSuccessful",
+      "productsPerWagon"
+    ]),
     hasError() {
       return this.selectedPosition == null;
     }
   },
   methods: {
-    ...mapActions(["selectWagonPosition", "saveClassification"]),
+    ...mapActions([
+      "selectWagonPosition",
+      "saveClassification",
+      "createClassification"
+    ]),
     onSubmit() {
       this.selectWagonPosition(this.selectedPosition);
-      this.saveClassification(this.currentClassification);
-      this.$notify({ message: 'Se guardó la clasificación exitosamente', type: 'info' });
-      this.$router.push("home");
+      this.saveClassification(this.currentClassification).then(cls => {
+        this.$notify({
+          message: "Se guardó la clasificación exitosamente",
+          type: "info"
+        });
+        let productsInWagon = this.productsPerWagon[
+          `${cls.currentOven.id}:${cls.productionWagon.id}`
+        ];
+        productsInWagon = productsInWagon.filter(p => {
+          return p.quantity > p.classifiedPieces;
+        });
+        if (productsInWagon.length == 0) {
+          this.$notify({
+            message: "Se clasificaron todos los productos de esta vagoneta",
+            type: "info"
+          });
+          this.$router.push("home");
+        } else {
+          this.createClassification({
+            oven: cls.currentOven,
+            wagon: cls.productionWagon
+          });
+          this.$router.push("quality-check");
+        }
+      });
     }
   },
   watch: {

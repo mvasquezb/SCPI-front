@@ -13,7 +13,7 @@
             <p class="label">{{ item.label }}:</p>
             <p class="value">{{ item.value }}</p>
           </div>
-          <router-link class="btn btn-default" v-if="item.route" :to="item.route">Editar</router-link>
+          <router-link class="btn btn-default q-edit" v-if="item.route" :to="item.route"><i class="ti-pencil"></i></router-link>
           <!-- <button class="btn btn-default" v-if="item.action" @click="item.action">Editar</button> -->
         </div>
       </div>
@@ -27,7 +27,7 @@
             <p class="label">{{ item.label }}:</p>
             <p class="value">{{ item.value }}</p>
           </div>
-          <router-link class="btn btn-default" v-if="item.route" :to="item.route">Editar</router-link>
+          <router-link class="btn btn-default q-edit" v-if="item.route" :to="item.route"><i class="ti-pencil"></i></router-link>
           <!-- <button class="btn btn-default" v-if="item.action" @click="item.action">Editar</button> -->
         </div>
       </div>
@@ -35,7 +35,7 @@
         <div class="defect-list-header d-flex justify-content-between align-items-center pb-2">
           <p class="label m-0">Defectos</p>
           <button
-            class="btn btn-default btn-add-defect align-self-center m-0"
+            class="btn btn-info btn-add-defect align-self-center m-0"
             @click="goToAddDefect"
           >Registrar Defecto</button>
         </div>
@@ -77,7 +77,7 @@ export default {
     LoadingSpinner
   },
   computed: {
-    ...mapState(["currentClassification", "loading"]),
+    ...mapState(["currentClassification", "loading", "productsPerWagon"]),
     summaryData() {
       return [
         {
@@ -173,7 +173,11 @@ export default {
     }
   },
   methods: {
-    ...mapActions(["saveClassification", "systemEvaluate"]),
+    ...mapActions([
+      "saveClassification",
+      "systemEvaluate",
+      "createClassification"
+    ]),
     onSubmit() {
       if (!this.validate()) {
         return;
@@ -196,12 +200,35 @@ export default {
           this.$router.push("castDate-selection");
         }
       } else {
-        this.saveClassification(this.currentClassification);
-        this.$notify({
-          message: "Se guardó la clasificación exitosamente",
-          type: "info"
-        });
-        this.$router.push("home");
+        if (qLevels.system.code == "E" || qLevels.system.code == "C") {
+          this.$router.push("quantity-selection");
+        } else {
+          this.saveClassification(this.currentClassification).then(cls => {
+            this.$notify({
+              message: "Se guardó la clasificación exitosamente",
+              type: "info"
+            });
+            let productsInWagon = this.productsPerWagon[
+              `${cls.currentOven.id}:${cls.productionWagon.id}`
+            ];
+            productsInWagon = productsInWagon.filter(p => {
+              return p.quantity > p.classifiedPieces;
+            });
+            if (productsInWagon.length == 0) {
+              this.$notify({
+                message: "Se clasificaron todos los productos de esta vagoneta",
+                type: "info"
+              });
+              this.$router.push("home");
+            } else {
+              this.createClassification({
+                oven: cls.currentOven,
+                wagon: cls.productionWagon
+              });
+              this.$router.push("quality-check");
+            }
+          });
+        }
       }
     },
     goToAddDefect() {
@@ -266,6 +293,10 @@ export default {
     cursor: pointer;
     white-space: nowrap;
     border-radius: 4px;
+  }
+
+  .q-edit {
+    min-width: 60px;
   }
 }
 .q-check {

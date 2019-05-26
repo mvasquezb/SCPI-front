@@ -35,6 +35,7 @@ export default new Vuex.Store({
     redirectTo: '',
     allRules: [],
     tmpRuleModel: null,
+    productsPerWagon: {}
   },
   mutations: {
     initialiseStore(state) {
@@ -83,6 +84,7 @@ export default new Vuex.Store({
     },
     operationError: (state, e) => {
       state.operationError = e;
+      console.error(e);
     },
     createShift: (state, result) => {
       state.loading = false;
@@ -188,13 +190,21 @@ export default new Vuex.Store({
         polishOperator: operator,
       };
     },
-    classificationCreated: (state, { oven, wagon }) => {
-      if (state.currentClassification.oven == oven && state.currentClassification.currentWagon == wagon) {
-        return;
+    classificationCreated: (state, { oven, wagon, products }) => {
+      // let defects = state.currentClassification.defects;
+      // if (state.currentClassification.oven != oven || state.currentClassification.currentWagon != wagon) {
+      //   defects = [];
+      // }
+      if (!products) {
+        products = state.productsPerWagon[`${oven.id}:${wagon.id}`];
       }
+      console.log(products);
+      let product = getNextProductForWagon(products);
+      console.log(product);
       state.currentClassification = {
         ...state.currentClassification,
         quantity: 1,
+        defects: [],
         currentWagon: wagon,
         productionWagon: wagon,
         currentOven: oven,
@@ -202,10 +212,30 @@ export default new Vuex.Store({
         coatOperator: wagon.coatOperator,
         castOperator: wagon.castOperator,
         classifierOperator: state.currentUser,
+        productFamily: product ? product.productFamily : null,
+        productModel: product ? product.productModel : null,
+        color: product ? product.color : null,
       };
     },
-    classificationSaved: (state, classification) => {
+    classificationSaved: (state, { sentData, classification }) => {
       state.classifications.push(classification);
+
+      // Update products per wagon
+      let oven = sentData.currentOven;
+      let products = state.productsPerWagon[`${oven.id}:${sentData.currentWagon.id}`];
+      let product = products.filter((p) => {
+        return p.productModel.id == sentData.productModel.id
+          && p.color.id == sentData.color.id;
+      });
+      product = product[0];
+      product.classifiedPieces += classification.quantity;
+      products[products.indexOf(product)] = product;
+      state.productsPerWagon = {
+        ...state.productsPerWagon,
+        [`${oven.id}:${sentData.currentWagon.id}`]: [...products]
+      };
+      console.log(state.productsPerWagon);
+
       state.currentClassification = {
         ...state.currentClassification,
         defects: [],
@@ -360,6 +390,12 @@ export default new Vuex.Store({
         clauses: currentClauses,
       };
     },
+    wagonProductsLoaded: (state, { ovenId, wagonId, data }) => {
+      state.productsPerWagon = {
+        ...state.productsPerWagon,
+        [`${ovenId}:${wagonId}`]: data
+      };
+    }
   },
   actions: {
     doLogin({ commit }, loginData) {
@@ -455,12 +491,15 @@ export default new Vuex.Store({
         },
         defects: [
           'java.util.ArrayList',
-          [...classification.defects]
+          [...(classification.defects || [])]
         ]
       };
 
       return http.post('/classification', classification)
-        .then((r) => commit('classificationSaved', r.data))
+        .then((r) => {
+          commit('classificationSaved', { sentData: classification, classification: r.data });
+          return classification;
+        })
         .catch((e) => commit('operationError', e))
         .finally(() => commit('operationFinish'));
     },
@@ -544,7 +583,7 @@ export default new Vuex.Store({
 
       let def = [
         'java.util.ArrayList',
-        [...defects]
+        [...(defects || [])]
       ];
 
       return http.post('/quality-check', def)
@@ -593,6 +632,17 @@ export default new Vuex.Store({
     },
     addDefectToRule({ commit }, defect) {
       commit("addedDefectToRule", defect);
+    },
+    loadProductsForWagon({ commit }, { ovenId, wagonId }) {
+      commit('operationStart');
+
+      return http.get(`/ovens/${ovenId}/wagon-products/${wagonId}`)
+        .then((res) => {
+          commit('wagonProductsLoaded', { ovenId, wagonId, data: res.data });
+          return res.data;
+        })
+        .catch((e) => commit('operationError', e))
+        .finally(() => commit('operationFinish'));
     }
   }
 });
@@ -666,4 +716,14 @@ function getClausesForDefect(defect) {
   });
   console.log(clauses);
   return clauses;
+}
+
+function getNextProductForWagon(productList) {
+  // Get products not classified
+  let availableProducts = productList.filter((p) => p.quantity > p.classifiedPieces);
+  console.log(productList, availableProducts);
+  if (availableProducts.length > 0) {
+    return availableProducts[0];
+  }
+  return null;
 }

@@ -48,14 +48,20 @@ export default {
       "loading",
       "operationError",
       "operationSuccessful",
-      "currentClassification"
+      "currentClassification",
+      "productsPerWagon"
     ]),
     hasError() {
       return this.selectedEvaluation == null;
     }
   },
   methods: {
-    ...mapActions(["loadEvaluationTypes", "selectEvaluationType", "saveClassification"]),
+    ...mapActions([
+      "loadEvaluationTypes",
+      "selectEvaluationType",
+      "saveClassification",
+      "createClassification"
+    ]),
     onSubmit() {
       if (this.hasError) {
         return;
@@ -76,12 +82,30 @@ export default {
         }
         return;
       }
-      this.saveClassification(this.currentClassification).then(() => {
+      this.saveClassification(this.currentClassification).then(cls => {
         this.$notify({
           message: "Se guardó la clasificación exitosamente",
           type: "info"
         });
-        this.$router.push("home");
+        let productsInWagon = this.productsPerWagon[
+          `${cls.currentOven.id}:${cls.productionWagon.id}`
+        ];
+        productsInWagon = productsInWagon.filter(p => {
+          return p.quantity > p.classifiedPieces;
+        });
+        if (productsInWagon.length == 0) {
+          this.$notify({
+            message: "Se clasificaron todos los productos de esta vagoneta",
+            type: "info"
+          });
+          this.$router.push("home");
+        } else {
+          this.createClassification({
+            oven: cls.currentOven,
+            wagon: cls.productionWagon
+          });
+          this.$router.push("quality-check");
+        }
       });
     }
   },

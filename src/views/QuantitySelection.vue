@@ -66,18 +66,66 @@ export default {
         default: ["1 2 3 {backspace}", "4 5 6 {clear}", "7 8 9 0"]
       },
       input: null,
-      quantity: "",
+      quantity: ""
     };
   },
   computed: {
-    ...mapState(["currentClassification"]),
+    ...mapState(["currentClassification", "productsPerWagon"]),
+    assignedQualityLevel() {
+      return this.currentClassification.assignedQualityLevel;
+    },
+    systemQualityLevel() {
+      return this.currentClassification.systemQualityLevel;
+    }
   },
   methods: {
-    ...mapActions(["selectClassifiedQuantity"]),
+    ...mapActions([
+      "selectClassifiedQuantity",
+      "saveClassification",
+      "createClassification"
+    ]),
     onSubmit() {
       if (this.validate()) {
         this.selectClassifiedQuantity(this.quantity);
-        this.$router.push('castDate-selection');
+        let qLevels = {
+          system: this.systemQualityLevel,
+          assigned: this.assignedQualityLevel
+        };
+        if (
+          qLevels.system &&
+          qLevels.system.code == "R" &&
+          [64, 65].includes(this.currentClassification.productFamily.id)
+        ) {
+          // Si es tapa o accesorios y es rotura
+          this.$router.push("castDate-selection");
+        } else {
+          this.saveClassification(this.currentClassification).then(cls => {
+            this.$notify({
+              message: "Se guardó la clasificación exitosamente",
+              type: "info"
+            });
+            console.log("cls: " + cls);
+            let productsInWagon = this.productsPerWagon[
+              `${cls.currentOven.id}:${cls.productionWagon.id}`
+            ];
+            productsInWagon = productsInWagon.filter(p => {
+              return p.quantity > p.classifiedPieces;
+            });
+            if (productsInWagon.length == 0) {
+              this.$notify({
+                message: "Se clasificaron todos los productos de esta vagoneta",
+                type: "info"
+              });
+              this.$router.push("home");
+            } else {
+              this.createClassification({
+                oven: cls.currentOven,
+                wagon: cls.productionWagon
+              });
+              this.$router.push("quality-check");
+            }
+          });
+        }
       }
     },
     clear() {
