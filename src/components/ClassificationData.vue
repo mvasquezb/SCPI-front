@@ -43,19 +43,19 @@ export default {
       return [
         {
           title: "Cantidad",
-          value: { repr: this.quantity }
+          value: { repr: this.quantity || '-' }
         },
         {
           title: "Defecto",
-          value: { ...this.defect, repr: this.defect.type.code }
+          value: { ...this.defect, repr: this.defect ? this.defect.type.code : '-' }
         },
         {
           title: "Ubicación",
-          value: { ...this.location, repr: this.location.name }
+          value: { ...this.location, repr: this.location ? this.location.name : '-' }
         },
         {
           title: "Vagoneta",
-          value: { ...this.wagon, repr: this.wagon.code }
+          value: { ...this.wagon, repr: this.wagon ? this.wagon.code : '-' }
         }
       ];
     }

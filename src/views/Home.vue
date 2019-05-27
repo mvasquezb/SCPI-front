@@ -88,32 +88,33 @@ export default class Home extends Vue {
 
     this.classificationData = {
       id: 1,
-      quantity: 2,
-      currentDefect: {
-        id: 1,
-        type: {
-          id: 1,
-          code: 'QE',
-        },
-        location: {
-          id: 1,
-          code: '001',
-          name: 'Aleta'
-        }
-      },
+      quantity: 0,
+      currentDefect: null,
+      // currentDefect: {
+      //   id: 1,
+      //   type: {
+      //     id: 1,
+      //     code: 'QE',
+      //   },
+      //   location: {
+      //     id: 1,
+      //     code: '001',
+      //     name: 'Aleta'
+      //   }
+      // },
       defects: [
-        {
-          id: 1,
-          type: {
-            id: 1,
-            code: 'QE',
-          },
-          location: {
-            id: 1,
-            code: '001',
-            name: 'Aleta'
-          }
-        }
+        // {
+        //   id: 1,
+        //   type: {
+        //     id: 1,
+        //     code: 'QE',
+        //   },
+        //   location: {
+        //     id: 1,
+        //     code: '001',
+        //     name: 'Aleta'
+        //   }
+        // }
       ],
     };
   }
