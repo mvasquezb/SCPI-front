@@ -35,7 +35,7 @@
               />
             </div>
             <div class="col-md-3 text-center">
-              <button class="btn btn-end-shift btn-danger-custom">Terminar Turno</button>
+              <button class="btn btn-end-shift btn-danger-custom" @click="endShift">Terminar Turno</button>
             </div>
           </div>
         </div>
@@ -75,7 +75,7 @@ import LoadingSpinner from '@/components/LoadingSpinner.vue';
     shift: mapState(['currentShift']).currentShift,
   },
   methods: {
-    ...mapActions(['loadFactoryOvens', 'setCurrentWagon']),
+    ...mapActions(['loadFactoryOvens', 'setCurrentWagon', "endShift"]),
   },
 })
 export default class Home extends Vue {
