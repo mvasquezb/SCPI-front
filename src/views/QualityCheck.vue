@@ -165,8 +165,8 @@ export default {
         return `${text} - ${this.currentClassification.repair.repairType.name}`;
       }
       if (this.systemQualityLevel.code == "V") {
-        return `${text} - ${
-          this.currentClassification.evaluation.evaluationType.name
+        return `${text} ${
+          this.currentClassification.evaluation ? '- ' + this.currentClassification.evaluation.evaluationType.name : ''
         }`;
       }
       return text;

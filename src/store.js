@@ -708,7 +708,7 @@ function compileRuleClauses(rule) {
     let connector = c.connector && index != 0 ? ` ${c.connector} ` : '';
     return `${connector}${c.param} ${c.operator} ${parseClauseValue(c.value)}`;
   }).join('');
-
+  console.log(compiled);
   rule.antecedent = compiled;
 }
 
