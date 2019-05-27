@@ -21,6 +21,9 @@ import CastDateSelection from '@/views/CastDateSelection.vue';
 import WagonPositionSelection from '@/views/WagonPositionSelection.vue';
 import RuleIndex from '@/views/RuleIndex.vue';
 import RuleDetail from '@/views/RuleDetail.vue';
+import ReportIndex from '@/views/reports/ReportIndex.vue';
+import ClassificationReport from '@/views/reports/ClassificationReport.vue';
+import BreaksReport from '@/views/reports/BreaksReport.vue';
 
 Vue.use(Router)
 
@@ -130,7 +133,22 @@ const routes = [
         path: '/rules/:ruleId',
         name: 'rule-detail',
         component: RuleDetail
-      }
+      },
+      {
+        path: 'reports',
+        name: 'reports-index',
+        component: ReportIndex,
+      },
+      {
+        path: '/reports/classification',
+        name: 'classification-report',
+        component: ClassificationReport
+      },
+      {
+        path: '/reports/breaks',
+        name: 'breaks-report',
+        component: BreaksReport
+      },
     ]
   },
   {

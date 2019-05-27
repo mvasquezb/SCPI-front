@@ -1,6 +1,5 @@
 <template>
   <div class="q-check bg-white d-flex flex-column align-items-center">
-    <LoadingSpinner v-if="loading"/>
     <h4>Evaluación de Calidad</h4>
     <div class="row classification-summary bg-nude">
       <div class="col-7 d-flex flex-column">
@@ -70,12 +69,8 @@
 
 <script>
 import { mapState, mapActions } from "vuex";
-import LoadingSpinner from "@/components/LoadingSpinner.vue";
 
 export default {
-  components: {
-    LoadingSpinner
-  },
   computed: {
     ...mapState(["currentClassification", "loading", "productsPerWagon"]),
     summaryData() {

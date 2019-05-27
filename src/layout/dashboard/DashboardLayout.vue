@@ -4,6 +4,7 @@
       <template slot="links">
         <sidebar-link to="/" name="Inicio" icon="ti-panel"/>
         <sidebar-link to="/rules" name="Mantenimiento de Reglas" icon="ti-user"/>
+        <sidebar-link to="/reports" name="Reportes" icon="ti-bar-chart" />
         <!-- <sidebar-link to="/table-list" name="Table List" icon="ti-view-list-alt"/>
         <sidebar-link to="/typography" name="Typography" icon="ti-text"/>
         <sidebar-link to="/icons" name="Icons" icon="ti-pencil-alt2"/>
