@@ -35,7 +35,7 @@
               />
             </div>
             <div class="col-md-3 text-center">
-              <button class="btn btn-end-shift btn-danger-custom">Terminar Turno</button>
+              <button class="btn btn-end-shift btn-danger-custom" @click="endShift">Terminar Turno</button>
             </div>
           </div>
         </div>
@@ -75,7 +75,7 @@ import LoadingSpinner from '@/components/LoadingSpinner.vue';
     shift: mapState(['currentShift']).currentShift,
   },
   methods: {
-    ...mapActions(['loadFactoryOvens', 'setCurrentWagon']),
+    ...mapActions(['loadFactoryOvens', 'setCurrentWagon', "endShift"]),
   },
 })
 export default class Home extends Vue {
@@ -88,32 +88,33 @@ export default class Home extends Vue {
 
     this.classificationData = {
       id: 1,
-      quantity: 2,
-      currentDefect: {
-        id: 1,
-        type: {
-          id: 1,
-          code: 'QE',
-        },
-        location: {
-          id: 1,
-          code: '001',
-          name: 'Aleta'
-        }
-      },
+      quantity: 0,
+      currentDefect: null,
+      // currentDefect: {
+      //   id: 1,
+      //   type: {
+      //     id: 1,
+      //     code: 'QE',
+      //   },
+      //   location: {
+      //     id: 1,
+      //     code: '001',
+      //     name: 'Aleta'
+      //   }
+      // },
       defects: [
-        {
-          id: 1,
-          type: {
-            id: 1,
-            code: 'QE',
-          },
-          location: {
-            id: 1,
-            code: '001',
-            name: 'Aleta'
-          }
-        }
+        // {
+        //   id: 1,
+        //   type: {
+        //     id: 1,
+        //     code: 'QE',
+        //   },
+        //   location: {
+        //     id: 1,
+        //     code: '001',
+        //     name: 'Aleta'
+        //   }
+        // }
       ],
     };
   }

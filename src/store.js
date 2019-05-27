@@ -401,6 +401,10 @@ export default new Vuex.Store({
     shiftTypesLoaded: (state, types) => {
       state.shiftTypes = types;
     },
+    shiftEnd: (state) => {
+      state.currentShift = null;
+      state.currentClassification = {};
+    }
   },
   actions: {
     doLogin({ commit }, loginData) {
@@ -656,6 +660,9 @@ export default new Vuex.Store({
         .then((r) => commit('shiftTypesLoaded', r.data))
         .catch((e) => commit('operationError', e))
         .finally(() => commit('operationFinish'));
+    },
+    endShift({ commit }) {
+      commit('shiftEnd');
     }
   }
 });
@@ -701,7 +708,7 @@ function compileRuleClauses(rule) {
     let connector = c.connector && index != 0 ? ` ${c.connector} ` : '';
     return `${connector}${c.param} ${c.operator} ${parseClauseValue(c.value)}`;
   }).join('');
-
+  console.log(compiled);
   rule.antecedent = compiled;
 }
 
