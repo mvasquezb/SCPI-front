@@ -3,6 +3,7 @@
     <LoadingSpinner v-if="loading"/>
     <form-wizard
       title="Seleccionar modelo de producto a clasificar"
+      subtitle=""
       ref="wizard"
       nextButtonText="Siguiente"
       backButtonText="Atrás"
@@ -12,7 +13,7 @@
       @on-complete="onComplete"
     >
       <tab-content title="Familia de Producto" :beforeChange="loadProductModels">
-        <div class="row">
+        <div class="row family-selection">
           <div class="col-5 text-center">
             <h4>Seleccione la familia de producto</h4>
           </div>
@@ -22,9 +23,10 @@
                 class="col-3 grid-item"
                 v-for="fam in productFamilies"
                 :key="fam.id"
-                :class="{ 'selected': selectedFamily === fam }"
+                :class="{ 'selected': selectedFamily === fam, 'with-img': fam.image }"
                 @click="familySelect(fam)"
               >
+                <img v-if="fam.image" :src="`img/product-families/${fam.image}`">
                 <p>{{ fam.name }}</p>
               </div>
             </div>
@@ -74,7 +76,7 @@
             @click.native="onComplete"
             class="wizard-footer-right finish-button btn btn-default"
           >{{props.isLastStep ? 'Finalizar' : 'Siguiente'}}</wizard-button>
-        </div> -->
+        </div>-->
       </template>
     </form-wizard>
   </div>
@@ -92,7 +94,7 @@ export default {
     return {
       selectedFamily: null,
       selectedModel: null,
-      wizard: null,
+      wizard: null
     };
   },
   computed: {
@@ -123,7 +125,7 @@ export default {
     ...mapActions([
       "loadProductFamilies",
       "loadModelsForFamily",
-      "selectModel",
+      "selectModel"
     ]),
     familySelect(fam) {
       this.selectedFamily = fam;
@@ -169,8 +171,8 @@ export default {
     if (Object.keys(this.productFamilies).length === 0) {
       this.loadProductFamilies();
     }
-    this.wizard = this.$refs['wizard'];
-  },
+    this.wizard = this.$refs["wizard"];
+  }
 };
 </script>
 
@@ -185,6 +187,45 @@ export default {
   &.error {
     border: 1px solid red;
     box-shadow: 0px 0px 5px 2px red;
+  }
+}
+
+.family-selection {
+  .grid-item {
+    border: 1px solid black;
+    height: 150px;
+    margin: 5px;
+    padding: 115px 0 0 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    &.with-img {
+      padding: 0;
+    }
+
+    &.selected {
+      border: 3px solid #3498db;
+    }
+
+    &:hover {
+      background-color: #ccc;
+      cursor: pointer;
+    }
+
+    p {
+      margin: 0;
+      padding: 5px 0;
+      text-align: center;
+      width: 100%;
+      text-overflow: ellipsis;
+      border-top: 1px solid black;
+      background-color: white;
+    }
+
+    img {
+      max-height: 75%;
+    }
   }
 }
 
