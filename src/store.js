@@ -35,7 +35,8 @@ export default new Vuex.Store({
     redirectTo: '',
     allRules: [],
     tmpRuleModel: null,
-    productsPerWagon: {}
+    productsPerWagon: {},
+    shiftTypes: [],
   },
   mutations: {
     initialiseStore(state) {
@@ -203,6 +204,7 @@ export default new Vuex.Store({
       console.log(product);
       state.currentClassification = {
         ...state.currentClassification,
+        workshift: state.currentShift,
         quantity: 1,
         defects: [],
         currentWagon: wagon,
@@ -395,7 +397,10 @@ export default new Vuex.Store({
         ...state.productsPerWagon,
         [`${ovenId}:${wagonId}`]: data
       };
-    }
+    },
+    shiftTypesLoaded: (state, types) => {
+      state.shiftTypes = types;
+    },
   },
   actions: {
     doLogin({ commit }, loginData) {
@@ -641,6 +646,14 @@ export default new Vuex.Store({
           commit('wagonProductsLoaded', { ovenId, wagonId, data: res.data });
           return res.data;
         })
+        .catch((e) => commit('operationError', e))
+        .finally(() => commit('operationFinish'));
+    },
+    loadShiftTypes({ commit }) {
+      commit('operationStart');
+
+      return http.get(`/shift-types`)
+        .then((r) => commit('shiftTypesLoaded', r.data))
         .catch((e) => commit('operationError', e))
         .finally(() => commit('operationFinish'));
     }
