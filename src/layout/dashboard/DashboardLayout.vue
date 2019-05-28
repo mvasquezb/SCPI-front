@@ -3,7 +3,7 @@
     <side-bar backgroundColor="darkblue" activeColor="success">
       <template slot="links">
         <sidebar-link to="/home" name="Clasificación" icon="ti-panel"/>
-        <sidebar-link to="/rules" name="Mant. de Reglas" icon="ti-ruler"/>
+        <!-- <sidebar-link to="/rules" name="Mant. de Reglas" icon="ti-ruler"/> -->
         <sidebar-link to="/reports" name="Reportes" icon="ti-bar-chart" />
         <!-- <sidebar-link to="/table-list" name="Table List" icon="ti-view-list-alt"/>
         <sidebar-link to="/typography" name="Typography" icon="ti-text"/>

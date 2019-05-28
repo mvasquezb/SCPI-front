@@ -93,6 +93,7 @@ export default new Vuex.Store({
       state.operationSuccessful = result.error == null;
       if (state.operationSuccessful) {
         state.currentShift = {
+          className: "com.pmvb.scpiback.data.models.OperatorWorkShift",
           ...result.data,
           pieceClassifications: {
             "estandar": 0,
@@ -205,11 +206,13 @@ export default new Vuex.Store({
       state.currentClassification = {
         ...state.currentClassification,
         workshift: state.currentShift,
+        shift: state.currentShift.workshift,
         quantity: 1,
         defects: [],
         currentWagon: wagon,
         productionWagon: wagon,
         currentOven: oven,
+        productionOven: { ...oven, wagons: ['java.util.ArrayList', ...oven.wagons] },
         polishOperator: wagon.polishOperator,
         coatOperator: wagon.coatOperator,
         castOperator: wagon.castOperator,
@@ -221,7 +224,7 @@ export default new Vuex.Store({
     },
     classificationSaved: (state, { sentData, classification }) => {
       state.classifications.push(classification);
-
+      console.log(sentData, classification);
       // Update products per wagon
       let oven = sentData.currentOven;
       let products = state.productsPerWagon[`${oven.id}:${sentData.currentWagon.id}`];
@@ -230,8 +233,25 @@ export default new Vuex.Store({
           && p.color.id == sentData.color.id;
       });
       product = product[0];
-      product.classifiedPieces += classification.quantity;
-      products[products.indexOf(product)] = product;
+      if (typeof(product) === "undefined") {
+        product = {
+          productFamily: sentData.productFamily,
+          productModel: sentData.productModel,
+          classifiedPieces: 0,
+          quantity: 0,
+          color: sentData.color,
+          wagon: sentData.currentWagon,
+          oven: oven
+        };
+        product.classifiedPieces += classification.quantity;
+        product.quantity = classification.quantity;
+        products.push(product);
+      } else {
+        product.classifiedPieces += classification.quantity;
+        products.indexOf(product)
+        products[index] = product;
+      }
+
       state.productsPerWagon = {
         ...state.productsPerWagon,
         [`${oven.id}:${sentData.currentWagon.id}`]: [...products]
@@ -663,6 +683,44 @@ export default new Vuex.Store({
     },
     endShift({ commit }) {
       commit('shiftEnd');
+    },
+    getClassificationReport({ commit }, { shiftId, ovenId, productId }) {
+      commit('operationStart');
+
+      let url = "/reports/classification?";
+      shiftId = shiftId == "TODOS" ? "all" : shiftId;
+      ovenId = ovenId == "TODOS" ? "all" : ovenId;
+      productId = productId == "TODOS" ? "all" : productId;
+
+      url += `shift=${shiftId}&oven=${ovenId}&product=${productId}`;
+
+      return http.get(url)
+        .then((r) => {
+          let { report, ovenIds } = r.data;
+          report = report[1];
+          console.log(r.data, report, ovenIds);
+          report = report.map((row) => {
+            row.defects = row.defects[1];
+            console.log(row.product);
+            return {
+              ...row,
+              productCode: row.product.code,
+              colorId: row.color.id,
+              ovenId: ovenIds[row.id],
+              assignedQCode: row.assignedQualityLevel ? row.assignedQualityLevel.code : '',
+              systemQCode: row.systemQualityLevel ? row.systemQualityLevel.code : '',
+              defectCode: row.defects.length ? row.defects[0].defectType.code : '',
+              zoneCode: row.defects.length ? row.defects[0].affectedZone.code : '',
+              wagonCode: row.productionWagon.code,
+              castOp: row.castOperator.code,
+              polishOp: row.polishOperator.code,
+              coatOp: row.coatOperator.code,
+            };
+          });
+          return report;
+        })
+        .catch((e) => commit('operationError', e))
+        .finally(() => commit('operationFinish'));
     }
   }
 });

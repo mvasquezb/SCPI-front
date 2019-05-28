@@ -12,7 +12,9 @@
             <p class="label">{{ item.label }}:</p>
             <p class="value">{{ item.value }}</p>
           </div>
-          <router-link class="btn btn-default q-edit" v-if="item.route" :to="item.route"><i class="ti-pencil"></i></router-link>
+          <router-link class="btn btn-default q-edit" v-if="item.route" :to="item.route">
+            <i class="ti-pencil"></i>
+          </router-link>
           <!-- <button class="btn btn-default" v-if="item.action" @click="item.action">Editar</button> -->
         </div>
       </div>
@@ -26,7 +28,9 @@
             <p class="label">{{ item.label }}:</p>
             <p class="value">{{ item.value }}</p>
           </div>
-          <router-link class="btn btn-default q-edit" v-if="item.route" :to="item.route"><i class="ti-pencil"></i></router-link>
+          <router-link class="btn btn-default q-edit" v-if="item.route" :to="item.route">
+            <i class="ti-pencil"></i>
+          </router-link>
           <!-- <button class="btn btn-default" v-if="item.action" @click="item.action">Editar</button> -->
         </div>
       </div>
@@ -48,7 +52,7 @@
     <div class="row w-100 mx-1 my-2">
       <div class="col-12 footer">
         <button class="btn btn-default btn-back" @click="$router.push('home')">Volver</button>
-        <button class="btn btn-default btn-next" @click="onSubmit">Finalizar</button>
+        <button class="btn btn-success btn-next" @click="onSubmit">Finalizar</button>
       </div>
     </div>
     <b-modal id="confirm-modal" size="lg" title="Confirmar Clasificación" @ok="onFinish">
@@ -157,11 +161,17 @@ export default {
         this.systemQualityLevel.name
       }`;
       if (this.systemQualityLevel.code == "S") {
-        return `${text} - ${this.currentClassification.repair.repairType.name}`;
+        return `${text} ${
+          this.currentClassification.repair
+            ? "- " + this.currentClassification.repair.repairType.name
+            : ""
+        }`;
       }
       if (this.systemQualityLevel.code == "V") {
         return `${text} ${
-          this.currentClassification.evaluation ? '- ' + this.currentClassification.evaluation.evaluationType.name : ''
+          this.currentClassification.evaluation
+            ? "- " + this.currentClassification.evaluation.evaluationType.name
+            : ""
         }`;
       }
       return text;
