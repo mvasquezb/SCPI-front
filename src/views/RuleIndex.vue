@@ -19,7 +19,7 @@
           </b-col>
 
           <div class="col-3 text-right">
-            <router-link class="btn btn-default" to="/rules/new">Nueva Regla</router-link>
+            <router-link class="btn btn-success" to="/rules/new"><i class="ti-plus"></i> Nueva Regla</router-link>
           </div>
         </div>
       </div>
@@ -49,7 +49,7 @@
             <div class="d-flex justify-content-between row-actions">
               <router-link
                 :to="`/rules/${row.item.id}`"
-                class="btn btn-sm btn-default"
+                class="btn btn-sm btn-primary"
                 title="Editar"
               >
                 <i class="ti-pencil"></i>

@@ -159,7 +159,7 @@ export default {
 .grid-item {
   border: 1px solid black;
   margin: 5px;
-  padding: 20px;
+  padding: 20px 10px;
   display: flex;
   flex-direction: column-reverse;
 

@@ -248,7 +248,7 @@ export default new Vuex.Store({
         products.push(product);
       } else {
         product.classifiedPieces += classification.quantity;
-        products.indexOf(product)
+        let index = products.indexOf(product);
         products[index] = product;
       }
 

@@ -1,12 +1,11 @@
 <template>
   <div class="report-classification row bg-white flex-column align-items-center pb-4">
-    <h4>Reporte de Piezas</h4>
-    <div class="selection-container col-12 pb-4">
+    <div class="selection-container col-12" :class="{ 'pb-4': reportData == null }">
       <div class="row justify-content-center">
         <h4>Reporte de Clasificado de Piezas</h4>
       </div>
       <div class="row">
-        <b-form-select class="col-2 offset-1" v-model="config.oven" :options="ovenList"></b-form-select>
+        <b-form-select class="col-2 ml-5" v-model="config.oven" :options="ovenList"></b-form-select>
         <b-form-select class="col-2 offset-1" v-model="config.shift" :options="shiftList"></b-form-select>
         <b-form-select class="col-2 offset-1" v-model="config.product" :options="productList"></b-form-select>
         <b-button class="offset-1" variant="info" @click="generateReport">Generar Reporte</b-button>
@@ -69,6 +68,9 @@
                 class="my-0"
               ></b-pagination>
             </b-col>
+            <b-col md="3" class="offset-md-3 text-right">
+              <b-button variant="info">Exportar Reporte</b-button>
+            </b-col>
           </b-row>
         </div>
       </div>
@@ -101,8 +103,8 @@ export default {
           // tdClass: "w-25 text-truncate"
         },
         { key: "ovenId", label: "Horno" /*tdClass: "w-25"*/ },
-        { key: "assignedQCode", label: "Cal. Operario" /*tdClass: "w-25"*/ },
-        { key: "systemQCode", label: "Cal. Sistema" /*tdClass: "w-25"*/ },
+        { key: "assignedQCode", label: "Calidad Operario" /*tdClass: "w-25"*/ },
+        { key: "systemQCode", label: "Calidad Sistema" /*tdClass: "w-25"*/ },
         { key: "quantity", label: "Cantidad" /*tdClass: "w-25"*/ },
         { key: "defectCode", label: "Defecto" /*tdClass: "w-25"*/ },
         { key: "zoneCode", label: "Zona" /*tdClass: "w-25"*/ },
@@ -212,9 +214,6 @@ export default {
 
 <style lang="scss">
 .report-classification {
-  .selection-container {
-    border: 1px solid black;
-  }
   .btn-report {
     font-size: 2rem;
     border: 1px solid black;
