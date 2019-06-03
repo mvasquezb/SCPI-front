@@ -69,7 +69,12 @@
               ></b-pagination>
             </b-col>
             <b-col md="3" class="offset-md-3 text-right">
-              <b-button variant="info">Exportar Reporte</b-button>
+              <download-excel
+                class="btn btn-info"
+                :data="reportData"
+                :fields="jsonFields"
+                name="reporteClasificacion.xls"
+              >Exportar Reporte</download-excel>
             </b-col>
           </b-row>
         </div>
@@ -161,7 +166,15 @@ export default {
           };
         })
       ];
-    }
+    },
+    jsonFields() {
+      return this.fields.slice(1).reduce((acc, field) => {
+        return {
+          ...acc,
+          [field.label]: field.key,
+        };
+      }, {});
+    },
   },
   methods: {
     ...mapActions(["loadShiftTypes", "getClassificationReport"]),

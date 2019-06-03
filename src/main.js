@@ -8,6 +8,7 @@ import BootstrapVue from 'bootstrap-vue';
 import VueFormWizard from 'vue-form-wizard';
 import VueTouchKeyboard from "vue-touch-keyboard";
 import Vuelidate from 'vuelidate';
+import JsonExcel from 'vue-json-excel';
 import "vue-notifyjs/themes/default.css";
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 import 'vue-form-wizard/dist/vue-form-wizard.min.css';
@@ -21,6 +22,7 @@ Vue.use(BootstrapVue);
 Vue.use(VueFormWizard);
 Vue.use(VueTouchKeyboard);
 Vue.use(Vuelidate);
+Vue.component('downloadExcel', JsonExcel);
 
 new Vue({
   router,
