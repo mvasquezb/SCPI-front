@@ -32,26 +32,6 @@
               slot-scope="row"
             >{{ (currentPage - 1) * perPage + row.index + 1 }}</template>
 
-            <template slot="actions" slot-scope="row">
-              <div class="d-flex justify-content-between row-actions">
-                <router-link
-                  :to="`/rules/${row.item.id}`"
-                  class="btn btn-sm btn-default"
-                  title="Editar"
-                >
-                  <i class="ti-pencil"></i>
-                </router-link>
-                <b-button
-                  size="sm"
-                  variant="danger"
-                  @click="confirmDelete(row.item)"
-                  title="Eliminar"
-                >
-                  <i class="ti-trash"></i>
-                </b-button>
-              </div>
-            </template>
-
             <template slot="empty">
               <p class="text-center">Aún no hay registros</p>
             </template>

@@ -721,6 +721,44 @@ export default new Vuex.Store({
         })
         .catch((e) => commit('operationError', e))
         .finally(() => commit('operationFinish'));
+    },
+    getBreaksReport({ commit }, { shiftId, ovenId, productId }) {
+      commit('operationStart');
+
+      let url = "/reports/breaks?";
+      shiftId = shiftId == "TODOS" ? "all" : shiftId;
+      ovenId = ovenId == "TODOS" ? "all" : ovenId;
+      productId = productId == "TODOS" ? "all" : productId;
+
+      url += `shift=${shiftId}&oven=${ovenId}&product=${productId}`;
+
+      return http.get(url)
+        .then((r) => {
+          let { report, ovenIds } = r.data;
+          report = report[1];
+          console.log(r.data, report, ovenIds);
+          report = report.map((row) => {
+            row.defects = row.defects[1];
+            console.log(row.product);
+            return {
+              ...row,
+              productCode: row.product.code,
+              colorId: row.color.id,
+              ovenId: ovenIds[row.id],
+              assignedQCode: row.assignedQualityLevel ? row.assignedQualityLevel.code : '',
+              systemQCode: row.systemQualityLevel ? row.systemQualityLevel.code : '',
+              defectCode: row.defects.length ? row.defects[0].defectType.code : '',
+              zoneCode: row.defects.length ? row.defects[0].affectedZone.code : '',
+              wagonCode: row.productionWagon.code,
+              castOp: row.castOperator.code,
+              polishOp: row.polishOperator.code,
+              coatOp: row.coatOperator.code,
+            };
+          });
+          return report;
+        })
+        .catch((e) => commit('operationError', e))
+        .finally(() => commit('operationFinish'));
     }
   }
 });
