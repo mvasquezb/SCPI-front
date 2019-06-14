@@ -15,6 +15,11 @@
           <router-link class="btn btn-default q-edit" v-if="item.route" :to="item.route">
             <i class="ti-pencil"></i>
           </router-link>
+          <button
+            class="btn btn-default"
+            v-b-modal.wagon-info-modal
+            v-if="item.label == 'Vagoneta'"
+          >Ver detalle</button>
           <!-- <button class="btn btn-default" v-if="item.action" @click="item.action">Editar</button> -->
         </div>
       </div>
@@ -68,6 +73,35 @@
         <!-- Button with custom close trigger value -->
       </template>
     </b-modal>
+
+    <b-modal id="wagon-info-modal" title="Detalle de Vagoneta">
+      <template slot="default">
+        <div class="row">
+          <div class="col-6">
+            <h4>Pieza</h4>
+          </div>
+          <div class="col-6">
+            <h4>Cantidad Clasificada</h4>
+          </div>
+        </div>
+        <div
+          class="row"
+          v-for="product in wagonProducts"
+          :key="`${product.productFamily.id}:${product.productModel.id}`"
+        >
+          <div class="col-6">
+            <p>{{ product.productModel.name }}</p>
+          </div>
+          <div class="col-6 text-center">
+            <p>{{ product.classifiedPieces }} / {{ product.quantity }}</p>
+          </div>
+        </div>
+      </template>
+
+      <template slot="modal-footer" slot-scope="{ hide }">
+        <b-button variant="default" @click="hide()">Aceptar</b-button>
+      </template>
+    </b-modal>
   </div>
 </template>
 
@@ -102,6 +136,10 @@ export default {
           route: "color-selection"
         }
       ];
+    },
+    wagonProducts() {
+      let key = `${this.currentClassification.currentOven.id}:${this.currentClassification.currentWagon.id}`;
+      return this.productsPerWagon[key];
     },
     wagonOperators() {
       return [
