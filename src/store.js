@@ -69,9 +69,10 @@ export default new Vuex.Store({
       });
     },
     addStartWagon: (state, wagon) => {
+      let wagonCode = wagon.wagon.padStart(2, "0");
       state.tmpStartWagons = {
         ...state.tmpStartWagons,
-        [wagon.oven.id]: wagon.oven.wagons.filter(w => w.code == wagon.wagon)[0]
+        [wagon.oven.id]: wagon.oven.wagons.filter(w => w.code == wagonCode)[0]
       };
     },
     operationStart: (state) => {
