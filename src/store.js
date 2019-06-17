@@ -456,7 +456,7 @@ export default new Vuex.Store({
       commit('operationStart');
       http.post(`/users/${this.state.currentUser.id}/create-shift`, { shiftCode: this.state.tmpShiftCode, className: 'java.util.Map' })
         .then((r) => commit('createShift', r))
-        .catch((e) => commit('createShift', { error: e }))
+        .catch((e) => commit('createShift', e.response.data))
         .finally(() => commit('operationFinish'));
     },
     loadProductFamilies({ commit }) {

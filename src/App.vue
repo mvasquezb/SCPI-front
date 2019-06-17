@@ -17,6 +17,13 @@ export default {
   computed: {
     ...mapState(["loading", "operationError", "operationSuccessful"]),
   },
+  watch: {
+    operationError() {
+      if (this.operationError) {
+        this.$notify({ message: this.operationError, type: "danger" });
+      }
+    }
+  }
 };
 </script>
 
