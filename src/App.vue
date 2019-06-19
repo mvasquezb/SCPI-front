@@ -9,6 +9,7 @@
 <script>
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import { mapState } from 'vuex';
+import http from './http';
 
 export default {
   components: {
@@ -23,6 +24,9 @@ export default {
         this.$notify({ message: this.operationError, type: "danger" });
       }
     }
+  },
+  mounted() {
+    http.head("probe").then((r) => console.log(r));
   }
 };
 </script>
