@@ -75,6 +75,9 @@
     </b-modal>
 
     <b-modal id="wagon-info-modal" title="Detalle de Vagoneta">
+      <template slot="modal-title">
+        Detalle de Vagoneta {{ wagon.code.padStart(2, "0") }}
+      </template>
       <template slot="default">
         <div class="row">
           <div class="col-6">
@@ -90,7 +93,7 @@
           :key="`${product.productFamily.id}:${product.productModel.id}`"
         >
           <div class="col-6">
-            <p>{{ product.productModel.name }}</p>
+            <p>{{ product.productModel.name }} - {{ product.color.name }}</p>
           </div>
           <div class="col-6 text-center">
             <p>{{ product.classifiedPieces }} / {{ product.quantity }}</p>
@@ -213,6 +216,9 @@ export default {
         }`;
       }
       return text;
+    },
+    wagon() {
+      return this.currentClassification.currentWagon;
     }
   },
   methods: {
