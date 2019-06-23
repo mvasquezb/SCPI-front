@@ -33,7 +33,7 @@ export default {
     return {
       quantity: this.classification.quantity,
       defect: this.classification.defect,
-      location: this.classification.defect.location,
+      location: this.classification.defect.affectedZone,
       wagon: this.classification.wagon,
       date: Date.now()
     };
@@ -47,11 +47,11 @@ export default {
         },
         {
           title: "Defecto",
-          value: { ...this.defect, repr: this.defect ? this.defect.type.code : '-' }
+          value: { ...this.defect, repr: this.defect ? this.defect.defectType.code : '-' }
         },
         {
           title: "Ubicación",
-          value: { ...this.location, repr: this.location ? this.location.name : '-' }
+          value: { ...this.location, repr: this.location ? this.location.code.padStart(2, "0") : '-' }
         },
         {
           title: "Vagoneta",

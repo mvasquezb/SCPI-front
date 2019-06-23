@@ -71,7 +71,7 @@ import LoadingSpinner from '@/components/LoadingSpinner.vue';
     LoadingSpinner,
   },
   computed: {
-    ...mapState(['factoryOvens', 'creatingShift', 'currentClassification', 'startWagonsPerOven', 'loading']),
+    ...mapState(['factoryOvens', 'creatingShift', 'currentClassification', 'startWagonsPerOven', 'loading', 'classifications']),
     shift: mapState(['currentShift']).currentShift,
   },
   methods: {
@@ -79,44 +79,10 @@ import LoadingSpinner from '@/components/LoadingSpinner.vue';
   },
 })
 export default class Home extends Vue {
-  classificationData = {};
-
   created() {
     if (!Object.keys(this.factoryOvens).length) {
       this.loadFactoryOvens();
     }
-
-    this.classificationData = {
-      id: 1,
-      quantity: 0,
-      currentDefect: null,
-      // currentDefect: {
-      //   id: 1,
-      //   type: {
-      //     id: 1,
-      //     code: 'QE',
-      //   },
-      //   location: {
-      //     id: 1,
-      //     code: '001',
-      //     name: 'Aleta'
-      //   }
-      // },
-      defects: [
-        // {
-        //   id: 1,
-        //   type: {
-        //     id: 1,
-        //     code: 'QE',
-        //   },
-        //   location: {
-        //     id: 1,
-        //     code: '001',
-        //     name: 'Aleta'
-        //   }
-        // }
-      ],
-    };
   }
 
   createShiftStart() {
@@ -131,7 +97,7 @@ export default class Home extends Vue {
     return {
       quantity: this.classificationData.quantity,
       wagon: this.currentWagon,
-      defect: this.classificationData.currentDefect,
+      defect: this.classificationData.defect,
       location: this.classificationData.location,
     };
   }
@@ -157,6 +123,25 @@ export default class Home extends Vue {
 
   get totalClassifiedPieces() {
     return Object.values(this.shift.pieceClassifications).reduce((acc, val) => acc + val);
+  }
+
+  get latestClassification() {
+    if (!this.classifications.length) {
+      return null;
+    }
+    return this.classifications[this.classifications.length - 1];
+  }
+
+  get classificationData() {
+    if (!this.latestClassification) {
+      return {};
+    }
+    let defects = this.latestClassification.defects[1];
+    let defect = (!defects.length) ? {} : defects[defects.length - 1];
+    return {
+      defect,
+      ...this.latestClassification,
+    };
   }
 }
 </script>
