@@ -30,7 +30,7 @@
           class="summary-item d-flex justify-content-between"
         >
           <div class="d-flex flex-shrink align-items-center">
-            <p class="label">{{ item.label }}:</p>
+            <p class="label" :class="{ 'invisible': !item.label }">{{ item.label }}:</p>
             <p class="value">{{ item.value }}</p>
           </div>
           <router-link class="btn btn-default q-edit" v-if="item.route" :to="item.route">
@@ -54,7 +54,7 @@
         </ul>
       </div>
     </div>
-    <div class="row w-100 mx-1 my-2">
+    <div class="row w-90 mx-1 my-2">
       <div class="col-12 footer">
         <button class="btn btn-default btn-back" @click="$router.push('home')">Volver</button>
         <button class="btn btn-success btn-next" @click="onSubmit">Finalizar</button>
@@ -74,16 +74,16 @@
       </template>
     </b-modal>
 
-    <b-modal id="wagon-info-modal" title="Detalle de Vagoneta">
+    <b-modal id="wagon-info-modal" size="lg" title="Detalle de Vagoneta">
       <template slot="modal-title">
         Detalle de Vagoneta {{ wagon.code.padStart(2, "0") }}
       </template>
       <template slot="default">
         <div class="row">
-          <div class="col-6">
+          <div class="col-6 text-center">
             <h4>Pieza</h4>
           </div>
-          <div class="col-6">
+          <div class="col-6 text-center">
             <h4>Cantidad Clasificada</h4>
           </div>
         </div>
@@ -147,6 +147,11 @@ export default {
     wagonOperators() {
       return [
         {
+          label: "",
+          value: "",
+          route: "",
+        },
+        {
           label: "Pulidor",
           value: this.currentClassification.polishOperator.code,
           route: "polish-selection"
@@ -160,7 +165,7 @@ export default {
           label: "Colador",
           value: this.currentClassification.castOperator.code,
           route: "cast-selection"
-        }
+        },
       ];
     },
     defects() {
@@ -347,8 +352,7 @@ export default {
   .q-edit {
     min-width: 60px;
   }
-}
-.q-check {
+
   .classification-summary {
     padding: 10px 20px;
     margin: 0 20px;
@@ -383,9 +387,14 @@ export default {
   justify-content: space-between;
   padding-bottom: 20px;
 }
+
 .btn-add-defect {
   padding: 10px 15px;
   font-size: 14px;
   font-weight: 600;
+}
+
+.w-90 {
+  width: 90% !important;
 }
 </style>
