@@ -7,7 +7,7 @@
       <div class="row">
         <b-form-select class="col-2 ml-5" v-model="config.oven" :options="ovenList"></b-form-select>
         <b-form-select class="col-2 offset-1" v-model="config.shift" :options="shiftList"></b-form-select>
-        <b-form-select class="col-2 offset-1" v-model="config.product" :options="productList"></b-form-select>
+        <b-form-select class="col-2 offset-1" v-model="config.product" :options="productOptions"></b-form-select>
         <b-button class="offset-1" variant="info" @click="generateReport">Generar Reporte</b-button>
       </div>
       <div v-if="reportData" class="row justify-content-center mt-3">
@@ -105,7 +105,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(["factoryOvens", "shiftTypes", "productModels"]),
+    ...mapState(["factoryOvens", "shiftTypes", "productModels", "productList"]),
     ovenList() {
       return [
         "Horno",
@@ -119,11 +119,20 @@ export default {
         })
       ];
     },
-    productList() {
+    productOptions() {
+      console.log(this.productList
+          .reduce((a, b) => a.concat(b), [])
+          .map(p => {
+            return {
+              value: p.id,
+              text: p.name,
+              product: p
+            };
+          }));
       return [
         "Tipo Pieza",
         "TODOS",
-        ...Object.values(this.productModels)
+        ...this.productList
           .reduce((a, b) => a.concat(b), [])
           .map(p => {
             return {
@@ -153,11 +162,13 @@ export default {
           ...acc,
           [field.label]: field.key,
         };
-      }, {});
+      }, {
+        "Clasificación Manual": "manualClassification"
+      });
     },
   },
   methods: {
-    ...mapActions(["loadShiftTypes", "getClassificationReport"]),
+    ...mapActions(["loadShiftTypes", "getClassificationReport", "loadAllProducts"]),
     generateReport() {
       console.log("generar reporte");
       if (!this.validate()) {
@@ -167,7 +178,16 @@ export default {
         shiftId: this.config.shift,
         ovenId: this.config.oven,
         productId: this.config.product
-      }).then(reportData => (this.reportData = reportData));
+      }).then(reportData => this.processReportData(reportData));
+    },
+    processReportData(data) {
+      this.reportData = data.map((row) => {
+        let manual = row.assignedQualityLevel && row.assignedQualityLevel != row.systemQualityLevel;
+        return {
+          ...row,
+          manualClassification: manual ? "Sí" : "-",
+        };
+      });
     },
     validate() {
       if (this.config.oven == "Horno") {
@@ -195,6 +215,9 @@ export default {
   mounted() {
     if (Object.keys(this.shiftTypes).length == 0) {
       this.loadShiftTypes();
+    }
+    if (this.productList.length == 0) {
+      this.loadAllProducts();
     }
   },
   watch: {

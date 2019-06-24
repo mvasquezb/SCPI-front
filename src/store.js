@@ -38,6 +38,7 @@ export default new Vuex.Store({
     productsPerWagon: {},
     shiftTypes: [],
     productToEdit: null,
+    productList: [],
   },
   mutations: {
     initialiseStore(state) {
@@ -492,7 +493,10 @@ export default new Vuex.Store({
           && p.color.id == state.currentClassification.color.id;
       })[0];
       console.log(state.productToEdit);
-    }
+    },
+    loadAllModels: (state, products) => {
+      state.productList = products;
+    },
   },
   actions: {
     doLogin({ commit }, loginData) {
@@ -537,6 +541,13 @@ export default new Vuex.Store({
       http.get(`/product-families/${productFamily.id}/models?not-empty`)
         .then((r) => commit('loadProductModels', { ...r, famId: productFamily.id }))
         .catch((e) => commit('loadProductModels', { error: e }));
+    },
+    loadAllProducts({ commit }) {
+      commit('operationStart');
+      http.get('/products')
+        .then((r) => commit('loadAllModels', r.data))
+        .catch((e) => commit('operationError', e))
+        .finally(() => commit('operationFinish'));
     },
     selectModel({ commit }, selectedModel) {
       commit('selectCurrentModel', selectedModel);
