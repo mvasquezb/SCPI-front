@@ -1,7 +1,7 @@
 <template>
   <div class="q-check bg-white d-flex flex-column align-items-center">
     <h4>Evaluación de Calidad</h4>
-    <div class="row classification-summary bg-nude">
+    <div class="row w-90 classification-summary bg-nude">
       <div class="col-7 d-flex flex-column">
         <div
           v-for="(item, index) in summaryData"
@@ -12,10 +12,19 @@
             <p class="label">{{ item.label }}:</p>
             <p class="value">{{ item.value }}</p>
           </div>
-          <router-link class="btn btn-default q-edit" v-if="item.route && !item.btn" :to="item.route">
+          <router-link
+            class="btn btn-default q-edit"
+            v-if="item.route && !item.btn"
+            :to="item.route"
+          >
             <i class="ti-pencil"></i>
           </router-link>
-          <b-btn variant="default" class="q-edit" v-if="item.route && item.btn" @click="handleEditBtn(item.route)">
+          <b-btn
+            variant="default"
+            class="q-edit"
+            v-if="item.route && item.btn"
+            @click="handleEditBtn(item.route)"
+          >
             <i class="ti-pencil"></i>
           </b-btn>
           <button
@@ -78,9 +87,7 @@
     </b-modal>
 
     <b-modal id="wagon-info-modal" size="lg" title="Detalle de Vagoneta">
-      <template slot="modal-title">
-        Detalle de Vagoneta {{ wagon.code.padStart(2, "0") }}
-      </template>
+      <template slot="modal-title">Detalle de Vagoneta {{ wagon.code.padStart(2, "0") }}</template>
       <template slot="default">
         <div class="row">
           <div class="col-6 text-center">
@@ -133,7 +140,7 @@ export default {
             ? this.currentClassification.productModel.name
             : "No seleccionado",
           route: "model-selection",
-          btn: true,
+          btn: true
         },
         {
           label: "Color",
@@ -145,7 +152,9 @@ export default {
       ];
     },
     wagonProducts() {
-      let key = `${this.currentClassification.currentOven.id}:${this.currentClassification.currentWagon.id}`;
+      let key = `${this.currentClassification.currentOven.id}:${
+        this.currentClassification.currentWagon.id
+      }`;
       return this.productsPerWagon[key];
     },
     wagonOperators() {
@@ -153,7 +162,7 @@ export default {
         {
           label: "",
           value: "",
-          route: "",
+          route: ""
         },
         {
           label: "Pulidor",
@@ -169,7 +178,7 @@ export default {
           label: "Colador",
           value: this.currentClassification.castOperator.code,
           route: "cast-selection"
-        },
+        }
       ];
     },
     defects() {
