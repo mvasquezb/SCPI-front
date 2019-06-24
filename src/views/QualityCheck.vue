@@ -12,9 +12,12 @@
             <p class="label">{{ item.label }}:</p>
             <p class="value">{{ item.value }}</p>
           </div>
-          <router-link class="btn btn-default q-edit" v-if="item.route" :to="item.route">
+          <router-link class="btn btn-default q-edit" v-if="item.route && !item.btn" :to="item.route">
             <i class="ti-pencil"></i>
           </router-link>
+          <b-btn variant="default" class="q-edit" v-if="item.route && item.btn" @click="handleEditBtn(item.route)">
+            <i class="ti-pencil"></i>
+          </b-btn>
           <button
             class="btn btn-default"
             v-b-modal.wagon-info-modal
@@ -96,7 +99,7 @@
             <p>{{ product.productModel.name }} - {{ product.color.name }}</p>
           </div>
           <div class="col-6 text-center">
-            <p>{{ product.classifiedPieces }} / {{ product.quantity }}</p>
+            <p>{{ product.classifiedPieces }} / {{ product.quantity ? product.quantity : '-' }}</p>
           </div>
         </div>
       </template>
@@ -129,7 +132,8 @@ export default {
           value: this.currentClassification.productModel
             ? this.currentClassification.productModel.name
             : "No seleccionado",
-          route: "model-selection"
+          route: "model-selection",
+          btn: true,
         },
         {
           label: "Color",
@@ -230,7 +234,8 @@ export default {
     ...mapActions([
       "saveClassification",
       "systemEvaluate",
-      "createClassification"
+      "createClassification",
+      "startModelSelection"
     ]),
     onSubmit() {
       if (!this.validate()) {
@@ -329,6 +334,12 @@ export default {
         return false;
       }
       return true;
+    },
+    handleEditBtn(route) {
+      if (route == "model-selection") {
+        this.startModelSelection();
+        this.$router.push(route);
+      }
     }
   }
 };

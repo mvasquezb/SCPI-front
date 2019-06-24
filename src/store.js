@@ -37,6 +37,7 @@ export default new Vuex.Store({
     tmpRuleModel: null,
     productsPerWagon: {},
     shiftTypes: [],
+    productToEdit: null,
   },
   mutations: {
     initialiseStore(state) {
@@ -141,6 +142,54 @@ export default new Vuex.Store({
         product: model,
         productFamily: model.productFamily,
       };
+
+      // if is editing product in wagon 
+      if (state.productToEdit) {
+        // Update products per wagon
+        let oven = state.currentClassification.currentOven;
+        let currentWagon = state.currentClassification.currentWagon;
+        let products = state.productsPerWagon[`${oven.id}:${currentWagon.id}`];
+        let color = state.currentClassification.color;
+        let product = products.filter((p) => {
+          return p.productModel.id == model.id
+            && p.color.id == color.id;
+        });
+        product = product[0];
+        let newProduct = {
+          ...state.productToEdit,
+          quantity: 0,
+          classifiedPieces: 0,
+          productModel: model,
+          productFamily: model.productFamily,
+        };
+        // if product is not in `productsPerWagon` entry
+        // or product has classified pieces (!= 0), prepend it
+        // else (if product has no classifiedPieces), replace it
+        if (typeof (product) === "undefined" || state.productToEdit.classifiedPieces != 0) {
+          let newProduct = {
+            ...state.productToEdit,
+            quantity: 0,
+            classifiedPieces: 0,
+            productModel: model,
+            productFamily: model.productFamily,
+          };
+
+          products = [
+            newProduct,
+            ...products,
+          ];
+        } else {
+          let index = products.indexOf(state.productToEdit);
+          products[index] = newProduct;
+        }
+
+        state.productsPerWagon = {
+          ...state.productsPerWagon,
+          [`${oven.id}:${currentWagon.id}`]: [...products]
+        };
+
+        state.productToEdit = null;
+      }
     },
     colorsLoaded: (state, res) => {
       state.colors = res.data;
@@ -234,7 +283,7 @@ export default new Vuex.Store({
           && p.color.id == sentData.color.id;
       });
       product = product[0];
-      if (typeof(product) === "undefined") {
+      if (typeof (product) === "undefined") {
         product = {
           productFamily: sentData.productFamily,
           productModel: sentData.productModel,
@@ -246,7 +295,10 @@ export default new Vuex.Store({
         };
         product.classifiedPieces += classification.quantity;
         product.quantity = classification.quantity;
-        products.push(product);
+        products = [
+          product,
+          ...products
+        ];
       } else {
         product.classifiedPieces += classification.quantity;
         let index = products.indexOf(product);
@@ -425,6 +477,15 @@ export default new Vuex.Store({
     shiftEnd: (state) => {
       state.currentShift = null;
       state.currentClassification = {};
+    },
+    startModelSelection: (state) => {
+      let oven = state.currentClassification.currentOven;
+      let wagon = state.currentClassification.currentWagon;
+      state.productToEdit = state.productsPerWagon[`${oven.id}:${wagon.id}`].filter((p) => {
+        return p.productModel.id == state.currentClassification.productModel.id
+          && p.color.id == state.currentClassification.color.id;
+      })[0];
+      console.log(state.productToEdit);
     }
   },
   actions: {
@@ -760,6 +821,9 @@ export default new Vuex.Store({
         })
         .catch((e) => commit('operationError', e))
         .finally(() => commit('operationFinish'));
+    },
+    startModelSelection({ commit }) {
+      commit('startModelSelection');
     }
   }
 });
