@@ -93,7 +93,7 @@
         <div
           class="row"
           v-for="product in wagonProducts"
-          :key="`${product.productFamily.id}:${product.productModel.id}`"
+          :key="`${product.productModel.id}:${product.color.id}`"
         >
           <div class="col-6">
             <p>{{ product.productModel.name }} - {{ product.color.name }}</p>

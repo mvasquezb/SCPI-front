@@ -155,17 +155,11 @@ export default new Vuex.Store({
             && p.color.id == color.id;
         });
         product = product[0];
-        let newProduct = {
-          ...state.productToEdit,
-          quantity: 0,
-          classifiedPieces: 0,
-          productModel: model,
-          productFamily: model.productFamily,
-        };
+        console.log(product);
         // if product is not in `productsPerWagon` entry
         // or product has classified pieces (!= 0), prepend it
         // else (if product has no classifiedPieces), replace it
-        if (typeof (product) === "undefined" || state.productToEdit.classifiedPieces != 0) {
+        if (typeof (product) === "undefined") {
           let newProduct = {
             ...state.productToEdit,
             quantity: 0,
@@ -174,11 +168,23 @@ export default new Vuex.Store({
             productFamily: model.productFamily,
           };
 
-          products = [
-            newProduct,
-            ...products,
-          ];
+          if (state.productToEdit.classifiedPieces != 0) {
+            products = [
+              newProduct,
+              ...products,
+            ];
+          } else {
+            let index = products.indexOf(state.productToEdit);
+            products[index] = newProduct;
+          }
         } else {
+          let newProduct = {
+            ...state.productToEdit,
+            quantity: 0,
+            classifiedPieces: 0,
+            productModel: model,
+            productFamily: model.productFamily,
+          };
           let index = products.indexOf(state.productToEdit);
           products[index] = newProduct;
         }
