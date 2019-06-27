@@ -263,7 +263,7 @@ export default new Vuex.Store({
         products = state.productsPerWagon[`${oven.id}:${wagon.id}`];
       }
       console.log(products);
-      let product = getNextProductForWagon(products);
+      let product = getNextProductForWagon(products, state.currentClassification);
       console.log(product);
       state.currentClassification = {
         ...state.currentClassification,
@@ -924,7 +924,11 @@ function getClausesForDefect(defect) {
   return clauses;
 }
 
-function getNextProductForWagon(productList) {
+function getNextProductForWagon(productList, classification) {
+  let lastClassified = productList.filter((p) => p.productModel.id == classification.productModel.id);
+  if (lastClassified.length != 0) {
+    return lastClassified[0];
+  }
   // Get products not classified
   let availableProducts = productList.filter((p) => p.quantity > p.classifiedPieces);
   console.log(productList, availableProducts);
