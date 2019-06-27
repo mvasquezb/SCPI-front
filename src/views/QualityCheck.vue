@@ -106,7 +106,7 @@
             <p>{{ product.productModel.name }} - {{ product.color.name }}</p>
           </div>
           <div class="col-6 text-center">
-            <p>{{ product.classifiedPieces }} / {{ product.quantity ? product.quantity : '-' }}</p>
+            <p>{{ product.classifiedPieces }} / {{ product.quantity }}</p>
           </div>
         </div>
       </template>

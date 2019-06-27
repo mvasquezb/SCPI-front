@@ -160,7 +160,7 @@ export default {
         name: "",
         description: "",
         clauses: [{ ...this.defaultClause }],
-        factIndex: null,
+        factIndex: null
       },
       defaultClause: {
         id: 1,
@@ -214,10 +214,12 @@ export default {
       this.ruleModel = rules[0];
     },
     deleteRule() {
-      this.deleteRuleById(this.ruleModel);
-      this.$notify({
-        message: "Se eliminó la regla exitosamente",
-        type: "info"
+      this.deleteRuleById(this.ruleModel).then(() => {
+        this.$notify({
+          message: "Se eliminó la regla exitosamente",
+          type: "info"
+        });
+        this.$router.push("/rules");
       });
     },
     confirmDelete() {

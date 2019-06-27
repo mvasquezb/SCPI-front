@@ -169,26 +169,31 @@ export default new Vuex.Store({
             productFamily: model.productFamily,
           };
 
-          if (state.productToEdit.classifiedPieces != 0) {
-            products = [
-              newProduct,
-              ...products,
-            ];
-          } else {
-            let index = products.indexOf(state.productToEdit);
-            products[index] = newProduct;
-          }
-        } else {
-          let newProduct = {
-            ...state.productToEdit,
-            quantity: 0,
-            classifiedPieces: 0,
-            productModel: model,
-            productFamily: model.productFamily,
-          };
-          let index = products.indexOf(state.productToEdit);
-          products[index] = newProduct;
-        }
+          products = [
+            newProduct,
+            ...products,
+          ];
+
+          // if (state.productToEdit.classifiedPieces != 0) {
+          //   products = [
+          //     newProduct,
+          //     ...products,
+          //   ];
+          // } else {
+          //   let index = products.indexOf(state.productToEdit);
+          //   products[index] = newProduct;
+          // }
+        }// else {
+        //   let newProduct = {
+        //     ...state.productToEdit,
+        //     quantity: 0,
+        //     classifiedPieces: 0,
+        //     productModel: model,
+        //     productFamily: model.productFamily,
+        //   };
+        //   let index = products.indexOf(state.productToEdit);
+        //   products[index] = newProduct;
+        // }
 
         state.productsPerWagon = {
           ...state.productsPerWagon,
@@ -308,6 +313,9 @@ export default new Vuex.Store({
         ];
       } else {
         product.classifiedPieces += classification.quantity;
+        if (product.classifiedPieces > product.quantity) {
+          product.quantity = product.classifiedPieces;
+        }
         let index = products.indexOf(product);
         products[index] = product;
       }
@@ -710,7 +718,7 @@ export default new Vuex.Store({
     deleteRuleById({ commit }, rule) {
       commit('operationStart');
 
-      http.delete(`/rules/${rule.id}`)
+      return http.delete(`/rules/${rule.id}`)
         .then((r) => commit('ruleDeleted', r.data))
         .catch((e) => commit('operationError', e))
         .finally(() => commit('operationFinish'));
