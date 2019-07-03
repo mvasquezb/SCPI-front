@@ -925,9 +925,11 @@ function getClausesForDefect(defect) {
 }
 
 function getNextProductForWagon(productList, classification) {
-  let lastClassified = productList.filter((p) => p.productModel.id == classification.productModel.id);
-  if (lastClassified.length != 0) {
-    return lastClassified[0];
+  if (classification.productModel) {
+    let lastClassified = productList.filter((p) => p.productModel.id == classification.productModel.id);
+    if (lastClassified.length != 0) {
+      return lastClassified[0];
+    }
   }
   // Get products not classified
   let availableProducts = productList.filter((p) => p.quantity > p.classifiedPieces);
