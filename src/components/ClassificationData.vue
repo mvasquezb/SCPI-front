@@ -47,7 +47,7 @@ export default {
         },
         {
           title: "Defecto",
-          value: { ...this.defect, repr: this.defect ? this.defect.defectType.code : '-' }
+          value: { ...this.defect, repr: this.defect && this.defect.defectType ? this.defect.defectType.code : '-' }
         },
         {
           title: "Ubicación",
