@@ -45,6 +45,7 @@ export default new Vuex.Store({
       let savedState = localStorage.getItem('scpi_store');
       if (savedState) {
         this.replaceState(Object.assign(state, JSON.parse(savedState)));
+        state.loading = false;
       }
     },
     loginStart: (state) => state.loggingIn = true,
