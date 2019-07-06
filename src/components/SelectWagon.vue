@@ -86,15 +86,15 @@ export default {
     clear() {
       this.startWagon = "";
     },
-    // validate() {
-    //   this.$v.form.$touch();
-    //   let isValid = !this.$v.form.$invalid;
-    //   this.$emit("on-validate", this.$data, isValid);
-    //   if (isValid) {
-    //     this.onWagonSelected();
-    //   }
-    //   return isValid;
-    // },
+    validate() {
+      this.$v.form.$touch();
+      let isValid = !this.$v.form.$invalid;
+      this.$emit("on-validate", this.$data, isValid);
+      if (isValid) {
+        this.onWagonSelected();
+      }
+      return isValid;
+    },
     ovenUnavailable() {
       console.log("Oven unavailable");
     }

@@ -40,17 +40,31 @@ export default {
     validateStep(name) {
       let ref = this.$refs[name];
       if (!ref.validate) {
-        return true; 
+        return true;
       }
       return ref.validate();
     },
     onComplete() {
+      let valid = this.validateWagons();
+      if (!valid) {
+        this.$notify({ message: 'Debe corregir los datos ingresados', type: 'danger'});
+        return;
+      }
       if (this.tmpStartWagons && (Object.keys(this.tmpStartWagons).length == this.factoryOvens.length)) {
         this.createShift();
       } else {
         this.$notify({ message: 'Debe completar los datos requeridos', type: 'danger' });
       }
     },
+    validateWagons() {
+      if (!this.tmpStartWagons) {
+        return false;
+      }
+
+      return Object.keys(this.tmpStartWagons).reduce((valid, wagonId) => {
+        return valid && this.tmpStartWagons[wagonId];
+      }, true);
+    }
   }
 }
 </script>
