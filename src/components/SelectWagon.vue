@@ -91,7 +91,7 @@ export default {
       let isValid = !this.$v.form.$invalid;
       this.$emit("on-validate", this.$data, isValid);
       if (isValid) {
-        this.onWagonSelected();
+        this.onWagonSelected(); 
       }
       return isValid;
     },

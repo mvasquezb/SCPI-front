@@ -493,6 +493,7 @@ export default new Vuex.Store({
     shiftEnd: (state) => {
       state.currentShift = null;
       state.currentClassification = {};
+      state.productsPerWagon = {};
     },
     startModelSelection: (state) => {
       let oven = state.currentClassification.currentOven;
@@ -787,7 +788,9 @@ export default new Vuex.Store({
           let { report, ovenIds } = r.data;
           report = report[1];
           console.log(r.data, report, ovenIds);
-          report = report.map((row) => {
+          report = report.filter((row) => 
+            row.product
+          ).map((row) => {
             row.defects = row.defects[1];
             console.log(row.product);
             return {
@@ -862,6 +865,8 @@ function convertClauseValue(value) {
     } else {
       newVal = "FALSO";
     }
+  } else if (typeof value == "string" && value.match(/".*"/)) {
+      newVal = value.slice(1, value.length - 1);
   }
   return newVal;
 }
