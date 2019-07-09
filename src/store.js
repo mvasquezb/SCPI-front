@@ -475,7 +475,7 @@ export default new Vuex.Store({
       let newClauses = getClausesForDefect(defect);
       let currentClauses = !state.tmpRuleModel ? [] : [...state.tmpRuleModel.clauses];
 
-      currentClauses.splice(state.tmpRuleModel.factIndex, 0, ...newClauses);
+      currentClauses.splice(state.tmpRuleModel.factIndex, 1, ...newClauses);
       state.tmpRuleModel = {
         ...state.tmpRuleModel,
         clauses: currentClauses,
