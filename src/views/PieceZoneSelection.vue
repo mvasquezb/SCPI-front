@@ -15,7 +15,7 @@
             :class="{ 'selected': selectedZone === pieceZone }"
             @click="() => selectedZone = pieceZone"
           >
-            <p>{{ pieceZone.name }}</p>
+            <p>{{ pieceZone.name }} - {{ pieceZone.visible ? 'Visible' : 'No visible' }}</p>
           </div>
         </div>
       </div>
